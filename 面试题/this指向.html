@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="div">11111</div>
+    <script>
+        // 1.普通函数调用，此时 this 指向 window
+        // 2.构造函数调用， 此时 this 指向 实例对象
+        // 3.对象方法调用， 此时 this 指向 该方法所属的对象
+        // 4.通过事件绑定的方法， 此时 this 指向 绑定事件的对象
+        // 5.定时器函数， 此时 this 指向 window
+        const a = {
+            name: "a",
+            fun: function () {
+                console.log(this);
+            }
+        }
+
+        function b() {
+            console.log(this);
+        }
+
+        class C {
+            constructor(name) {
+                this.name = name
+            }
+            fun() {
+                console.log(this);
+            }
+        }
+        function d() {
+            console.log(this);
+        }
+        a.fun()
+        const c = new C("我是小c")
+        c.fun()
+        b()
+        document.getElementById("div").onclick = d
+    </script>
+</body>
+
+</html>

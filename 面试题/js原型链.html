@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        //原型链
+        // https://cloud.tencent.com/developer/article/2061444
+
+        // 在javascript中，实例对象与原型之间的链接，叫做原型链。其基本思想是利用原型让一个引用类型继承另一个引用类型的属性和方法。然后层层递进，就构成了实例与原型的链条，这就是所谓原型链的基本概念。
+
+        // 首先先记住几个概念：
+
+        // 隐式原型：所有引用类型（函数、数组、对象）都有 __proto__ 属性，例如arr.__proto__
+        // 显式原型：所有函数拥有prototype属性，例如：func.prototype
+        // 原型对象：拥有prototype属性的对象，在定义函数时被创建
+
+        // js中所有的函数都有一个prototype的属性，该属性引用了一个对象，该对象叫做原型对象
+        // js中每个对象都有一个__proto__属性，该属性指向它构造函数的prototype
+        class Test {
+            constructor() {
+                name: "test"
+            }
+        }
+        const a = function () {
+            console.log("fun");
+        }
+        const t = new Test()
+        console.log(a.prototype);
+        console.log("11".__proto__);
+        console.log(Object.prototype);
+        console.log(t.__proto__, Test.prototype, "class");
+        console.log(Object.prototype.__proto__);
+        console.log(Test.__proto__); 
+    </script>
+</body>
+
+</html>

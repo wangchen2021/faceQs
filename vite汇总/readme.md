@@ -12,7 +12,6 @@ vite他利用了浏览器对于es的支持，他会拦截HTTP请求，根据需�
 Webpack采用全量更新，修改单个文件也会触发整体重建。‌‌
 Vite实现增量更新，仅重新编译改动模块并局部刷新页面。‌‌
 
-
 - 配置上
 Webpack需编写webpack.config.js定义loader、plugin等，配置项多达数百个。‌‌
 Vite默认集成TypeScript、CSS预处理器等，80%常用功能无需额外配置。‌‌

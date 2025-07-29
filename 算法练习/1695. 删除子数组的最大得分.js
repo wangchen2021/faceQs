@@ -53,7 +53,7 @@
 //暴力解法 失败~
 
 
-var maximumUniqueSubarray = function(nums) {
+var maximumUniqueSubarray = function (nums) {
     const n = nums.length;
     const psum = new Array(n + 1).fill(0);
     const cnt = new Map();
@@ -67,7 +67,7 @@ var maximumUniqueSubarray = function(nums) {
     return ans;
 };
 
-const res= maximumUniqueSubarray([4, 2, 4, 5, 6])
+const res = maximumUniqueSubarray([6, 4, 2, 4, 5, 6])
 console.log(res);
 
 //官方解法

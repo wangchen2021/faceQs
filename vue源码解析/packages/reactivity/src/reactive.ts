@@ -1,5 +1,6 @@
 import { isObject } from "@vue/shared";
-import { mutableHandlers, ReactiveFlags } from "./baseHandler";
+import { mutableHandlers } from "./baseHandler";
+import { ReactiveFlags } from "./constants";
 
 //记录缓存代理后的结果
 const reactiveMap = new WeakMap();
@@ -26,4 +27,16 @@ function createReactiveObject(target: any) {
     //缓存代理后的结果
     reactiveMap.set(target, proxy);
     return proxy;
+}
+
+export function toReactive(value: any) {
+    if (isObject(value)) {
+        return reactive(value);
+    }
+    return value;
+}
+
+export function isReactive(value: any) {
+    //判断是否是响应式对象
+    return !!(value && value[ReactiveFlags.IS_REACTIVE]); //等价Boolean(value && value[ReactiveFlags.IS_REACTIVE]);
 }

@@ -16,7 +16,6 @@ export function track(target: any, key: any) {
             depsMap = new Map();
             targetMap.set(target, depsMap);
         }
-
         let dep = depsMap.get(key);
         //如果没有依赖，创建一个
         if (!dep) {
@@ -32,7 +31,7 @@ export function trriger(target: any, key: any, value: any, oldValue: any) {
         return;
     }
     const dep = depsMap.get(key);
-    if (!dep) {
+    if (!dep || value === oldValue) {
         return;
     }
     trrigerEffects(dep)//触发依赖

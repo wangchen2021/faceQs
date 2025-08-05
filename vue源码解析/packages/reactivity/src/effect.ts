@@ -1,3 +1,5 @@
+import { DirtyLevels } from "./constants";
+
 export function effect(fn: Function, options: object) {
     //创建响应effect 数据变化后重新执行
     const _effect = new ReactiveEffect(fn, () => {
@@ -32,17 +34,28 @@ function postCleanEffect(effect: ReactiveEffect) {
     }
 }
 
-class ReactiveEffect {
+export class ReactiveEffect {
     _trackId = 0  //用于跟踪依赖 每执行一次加一
     deps: any[] = []; //存储依赖
     _depsLength = 0; //依赖长度
+    running = 0; //是否正在运行
+    _dirtyLevel = DirtyLevels.Dirty
     public active = true; //是否激活
     constructor(public fn: Function, public scheduler: Function) {
         this.fn = fn;
         this.scheduler = scheduler;
     }
+    public get dirty() {
+        return this._dirtyLevel === DirtyLevels.Dirty; //是否脏标志
+    }
+
+    public set dirty(value: boolean) {
+        this._dirtyLevel = value ? DirtyLevels.Dirty : DirtyLevels.NoDirty; //设置脏标志
+    }
+
     //执行fn
     run() {
+        this._dirtyLevel = DirtyLevels.NoDirty; //设置脏标志
         if (!this.active) {
             return this.fn();
         }
@@ -51,10 +64,20 @@ class ReactiveEffect {
             //设置当前effect为activeEffect
             activeEffect = this;
             preCleanEffect(this); //清理之前的依赖
+            this.running++
             return this.fn();
         } finally {
+            this.running--
             postCleanEffect(this)
             activeEffect = lastEffect; //执行完后清除activeEffect
+        }
+    }
+
+    stop() {
+        if (this.active) {
+            this.active = false
+            preCleanEffect(this); //清理之前的依赖
+            postCleanEffect
         }
     }
 }
@@ -86,8 +109,14 @@ export function trackEffects(effect: ReactiveEffect, dep: Map<any, any>) {
 
 export function trrigerEffects(dep: Map<any, any>) {
     for (const effect of dep.keys()) {
-        if (effect.scheduler) {
+        if (effect._dirtyLevel === DirtyLevels.NoDirty) {
+            effect._dirtyLevel = DirtyLevels.Dirty; //设置脏标志
+        }
+    }
+    for (const effect of dep.keys()) {
+        if (!effect.running && effect.active) {
             effect.scheduler();
         }
     }
 }
+

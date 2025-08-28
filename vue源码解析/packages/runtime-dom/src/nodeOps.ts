@@ -18,6 +18,10 @@ export const nodeOps = {
         return document.createElement(type)
     },
 
+    createText(text: string) {
+        return new Text(text)
+    },
+
     setText(node: Text, text: string) {
         node.nodeValue = text
     },

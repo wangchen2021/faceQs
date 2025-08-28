@@ -7,4 +7,5 @@ export enum ShapeFlags {
     SLOTS_CHILDREN = 1 << 5, // 1 << 5
     TELEPORT = 1 << 6, // 1 << 6
     SUSPENSE = 1 << 7, // 1 << 7
+    COMPONENT = ShapeFlags.STATEFUL_COMPONENT | ShapeFlags.FUNCTIONAL_COMPONENT, // 组件
 }

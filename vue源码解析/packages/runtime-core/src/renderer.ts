@@ -1,6 +1,7 @@
 import { ShapeFlags } from "@vue/shared";
-import { isSameVnode } from "./createVnode";
+import { Fragment, isSameVnode, Text } from "./createVnode";
 import { getSequence } from "./seq";
+import { reactive, ReactiveEffect } from "vue";
 
 export function createRenderer(renderOptions: any) {
 
@@ -236,6 +237,81 @@ export function createRenderer(renderOptions: any) {
         patchChildren(n1, n2, el as VueTMLElement) // 更新子节点
     }
 
+    const processText = (n1: vnode | null, n2: vnode, container: VueTMLElement) => {
+        if (n1 === null) {
+            n2.el = hostCreateText(n2.children as string, container)
+            hostInsert(n2.el, container)
+        } else {
+            n2.el = n1.el
+            if (n1.children !== n2.children) {
+                hostSetText(n2.el, n2.children as string)
+            }
+        }
+    }
+
+    const processFragment = (n1: vnode | null, n2: vnode, container: VueTMLElement) => {
+        if (n1 === null) {
+            mountChildren(n2.children as Array<vnode>, container)
+        } else {
+            patchChildren(n1, n2, container)
+        }
+    }
+
+    const mountComponent = (vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
+        //挂载组件
+        const { data = () => { }, render } = vnode.type as VueComponent
+
+        const state = reactive(data()) //响应式数据
+
+        const instance: {
+            state: any,
+            isMounted: boolean,
+            vnode: vnode,
+            subTree: any,
+            update: (() => void) | null,
+        } = {
+            state,
+            isMounted: false,
+            vnode,
+            subTree: null,
+            update: null,
+        }
+
+        const componentUpdateFn = () => {
+            if (!instance.isMounted) {
+                const subTree = render?.call(state, state) //render函数的this指向组件的状态
+                patch(null, subTree, container, anchor) //递归调用patch函数
+                instance.isMounted = true
+                instance.subTree = subTree
+            } else {
+                const subTree = render?.call(state, state) //render函数的this指向组件的状态
+                patch(instance.subTree, subTree, container, anchor) //递归调用patch函数
+                instance.subTree = subTree
+            }
+        }
+
+
+        const effect = new ReactiveEffect(componentUpdateFn, () => { update() })
+
+        const update = () => {
+            effect.run()
+        }
+
+        instance.update = update
+
+        update()
+    }
+
+    const processComponent = (n1: vnode | null, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
+        if (n1 === null) {
+            //挂载组件
+            // mountComponent(n2,container)
+        } else {
+            //更新组件
+            // updateComponent(n1,n2)
+        }
+    }
+
     const patch = (n1: vnode | null, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
 
         // 这里可以实现虚拟 DOM 的 diff 算法
@@ -246,11 +322,31 @@ export function createRenderer(renderOptions: any) {
             unmount(n1)
             n1 = null // 重置 n1 为 null
         }
-        processElement(n1, n2, container, anchor) // 处理元素节点
+        const { type, shapeFlag } = n2
+        switch (type) {
+            case Text:
+                processText(n1, n2, container)
+                break
+            case Fragment:
+                processFragment(n1, n2, container)
+                break;
+            default:
+                if (shapeFlag & ShapeFlags.ELEMENT) {
+                    processElement(n1, n2, container, anchor) // 处理元素节点
+                } else if (shapeFlag & ShapeFlags.COMPONENT) {
+                    //处理组件
+                    processComponent(n1, n2, container, anchor)
+                }
+        }
+
     }
 
     const unmount = (vnode: vnode) => {
-        hostRemove(vnode.el!)
+        if (vnode.type === Fragment) {
+            return unmountChildren(vnode.children as Array<vnode>)
+        } else {
+            hostRemove(vnode.el!)
+        }
     }
 
     // 渲染函数 将虚拟节点渲染到真实 DOM 上

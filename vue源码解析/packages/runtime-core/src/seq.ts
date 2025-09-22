@@ -6,8 +6,9 @@ export function getSequence(arr: Array<number>) {
     let middle;
     const len = arr.length
     for (let i = 0; i < len; i++) {
+
         const arrI = arr[i]
-        if (arrI !== 0) { //适配vue3
+        if (arrI !== 0) { // 适配vue3
             let resultLastIndex = result[result.length - 1]
             if (arr[resultLastIndex] < arrI) {
                 p[i] = resultLastIndex // 记录前驱节点
@@ -15,6 +16,7 @@ export function getSequence(arr: Array<number>) {
                 continue
             }
         }
+
         start = 0
         end = result.length - 1
         while (start < end) {
@@ -30,6 +32,7 @@ export function getSequence(arr: Array<number>) {
             p[i] = result[start - 1] // 记录前驱节点
             result[start] = i // 找到第一个大于等于当前元素的位置，进行替换
         }
+
     }
 
     // 倒叙追溯
@@ -43,6 +46,46 @@ export function getSequence(arr: Array<number>) {
     return result
 }
 
+// function getSequence2(arr: Array<number>) {
+//     const result = [0]
+//     const p = result.slice(0)
+//     let start, end, middle = 0
+//     for (let i = 0; i < arr.length; i++) {
+//         const target = arr[i]
+//         const lastIndex = result[result.length - 1]
+//         if (target !== 0) {
+//             if (target > arr[lastIndex]) {
+//                 p[i] = lastIndex
+//                 result.push(i)
+//                 continue
+//             }
+//         }
 
-// console.log(getSequence([2, 6, 7, 8, 9, 11]));
-// console.log(getSequence([2, 3, 1, 7, 5, 8, 9, 11, 4]));
+//         start = 0
+//         end = result.length - 1
+//         while (start < end) {
+//             middle = (start + end) >> 1
+//             if (arr[result[middle]] < target) {
+//                 start = middle + 1
+//             } else {
+//                 end = middle
+//             }
+//         }
+
+//         if (target < arr[result[start]]) {
+//             p[i] = result[start - 1]
+//             result[start] = i
+//         }
+//     }
+
+//     let j = result.length
+//     let last = result[j - 1]
+//     while (j-- > 0) {
+//         result[j] = last
+//         last = p[last]
+//     }
+
+//     return result
+// }
+
+// console.log(getSequence2([2, 3, 1, 7, 5, 8, 9, 11, 4]));

@@ -129,31 +129,33 @@ export function createRenderer(renderOptions: any) {
         }
         // 中间对比
         else {
+            
             let s1 = i // 新数组的起始索引
             let s2 = i // 旧数组的起始索引
             const keyToNewIndexMap = new Map() // 用于存储新节点的索引
 
             // 挂载新节点
-            let toBePatched = e2 - s2 + i // 需要挂载的新节点数量
+            let toBePatched = e2 - s2 + i
 
-            let newIndexToOldIndexMap = new Array(toBePatched).fill(0) // 用于存储新节点的索引映射
+            let newIndexToOldIndexMap = new Array(toBePatched).fill(0) // 用于存储新节点的索引映射 [0,0,0...e2]
 
             for (let i = s2; i <= e2; i++) {
                 const vnode = c2[i]
                 keyToNewIndexMap.set(vnode.key, i) // 将新节点的索引 存储到map中
             }
+
             for (let i = s1; i <= e1; i++) {
                 const vnode = c1[i]
                 const newIndex = keyToNewIndexMap.get(vnode.key) // 获取旧节点在新节点中的索引
                 if (newIndex === undefined) {
                     unmount(vnode) // 如果新节点中没有该旧节点，卸载旧节点
                 } else {
-                    newIndexToOldIndexMap[newIndex - s2] = i + 1 // 将旧节点的索引存储到新节点的索引映射中
+                    newIndexToOldIndexMap[newIndex - s2] = i + 1 // 将旧节点的索引存储到新节点的索引映射中 [2,5,3,0,0,6,0,7]
                     patch(vnode, c2[newIndex], el) // 如果新节点中有该旧节点，递归比较
                 }
             }
 
-            let increasingNewIndexSequence = getSequence(newIndexToOldIndexMap) // 获取最长递增子序列
+            let increasingNewIndexSequence = getSequence(newIndexToOldIndexMap) // 获取最长递增子序列 [2,3,6,7]
 
             console.log(newIndexToOldIndexMap, increasingNewIndexSequence);
 
@@ -173,6 +175,7 @@ export function createRenderer(renderOptions: any) {
                     hostInsert(vnode.el, el, anchor) // 如果新节点已经存在，直接插入
                 }
             }
+
         }
     }
 

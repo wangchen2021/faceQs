@@ -10,34 +10,49 @@
 
 // https://leetcode.cn/problems/longest-palindromic-substring/description/
 
+
 /**
  * @param {string} s
  * @return {string}
  */
 var longestPalindrome = function (s) {
-    if (s.length <= 1) return s
-    let res = ""
-    function centerStr(s, index) {
-        let head = index
-        let tail = index + 1
-        let res = ""
-        while (tail >= 0 && head < s.length) {
-            if (s.charAt(tail) === s.charAt(head)) {
-                res = s.charAt(tail) + res + s.charAt(tail)
+    //动态规划
+    //len=1 p(0,0) true
+    //len=2 p(0,1) Boolean(s0==s1)
+    //p(i,j) si===sj&&P(i+1,j-1) 中心扩散 扩散终止条件 s1!===sj
+
+    const len = s.length
+    if (len < 2) return s
+
+    let maxLength = 1
+    let start = 0
+
+    const p = Array.from({length:len},()=>Array(len).fill(false))
+    
+    for (let i = 0; i < p.length; i++) {
+        p[i][i] = true
+    }
+
+    for (let L = 2; L <= len; L++) {
+        for (let i = 0; i < len; i++) {
+            const j = L + i - 1
+            if (j >= len) break
+            if (s.charAt(i) !== s.charAt(j)) {
+                p[i][j] = false
             } else {
-                break
+                p[i][j] = L <= 3 ? true : p[i + 1][j - 1]
             }
-            tail--
-            head++
+            if (p[i][j] && L > maxLength) {
+                start = i
+                maxLength = L
+            }
         }
-        return res
     }
-    for (let i = 0; i < s.length; i++) {
-        const targetStr = centerStr(s, i)
-        res = res.length > targetStr.length ? res : targetStr
-    }
-    return res
+
+    return s.substring(start, start + maxLength)
+
 };
 
 
-console.log(longestPalindrome("babad"));
+console.log(longestPalindrome("bb"));
+

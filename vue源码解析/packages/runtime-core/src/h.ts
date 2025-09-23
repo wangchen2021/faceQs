@@ -12,6 +12,9 @@ import { createVnode, isVnode } from "./createVnode"
 export function h(type: any, propsOrChildren?: any, children?: any) {
     const l = arguments.length
     //如果第二个参数是字符串，说明是儿子
+    if (l === 1) {
+        return createVnode(type)
+    }
     if (l === 2) {
         if (isObject(propsOrChildren) && !Array.isArray(propsOrChildren)) {
             if (isVnode(propsOrChildren)) {

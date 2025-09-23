@@ -7,15 +7,30 @@ declare interface VueTMLElement extends HTMLElement {
 declare type VueComponent = {
     data?: Function, //组件的data数据
     render?: Function, //组件的render函数
+    props: any, //组件的props选项
 }
 
 declare type vnode = {
     type: string | symbol | VueComponent, //节点类型
-    props?: Record<string, any>,
+    props?:  { [key: string | symbol]: any },
     children?: Array<vnode | string> | string,
     el: VueTMLElement | null, //真实节点
     shapeFlag: number, //标记节点类型
     key?: string | number, //唯一标识
     __v_isVNode?: true, //标识是虚拟节点
+    component?: ComponentInstance //组件实例
 }
 
+declare type ComponentInstance = {
+    data: any,
+    isMounted: boolean,
+    vnode: vnode,
+    subTree: any,
+    update: (() => void) | null,
+    props: { [key: string | symbol]: any },
+    attrs: { [key: string | symbol]: any },
+    propsOptions: { [key: string | symbol]: any },
+    proxy: { [key: string | symbol]: any },
+    component: ComponentInstance|null,
+    render?: Function,
+}

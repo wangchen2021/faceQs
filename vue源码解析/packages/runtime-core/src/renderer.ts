@@ -1,7 +1,9 @@
-import { ShapeFlags } from "@vue/shared";
+import { hasOwn, ShapeFlags } from "@vue/shared";
 import { Fragment, isSameVnode, Text } from "./createVnode";
 import { getSequence } from "./seq";
-import { reactive, ReactiveEffect } from "vue";
+import { reactive, ReactiveEffect } from "@vue/reactivity";
+import { queueJob } from "./scheduler";
+import { createComponentInstance, setupComponent } from "./component";
 
 export function createRenderer(renderOptions: any) {
 
@@ -129,7 +131,7 @@ export function createRenderer(renderOptions: any) {
         }
         // 中间对比
         else {
-            
+
             let s1 = i // 新数组的起始索引
             let s2 = i // 旧数组的起始索引
             const keyToNewIndexMap = new Map() // 用于存储新节点的索引
@@ -260,55 +262,47 @@ export function createRenderer(renderOptions: any) {
         }
     }
 
-    const mountComponent = (vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
+    const setupRenderEffect = (instance: ComponentInstance, vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null) => {
         //挂载组件
-        const { data = () => { }, render } = vnode.type as VueComponent
-
-        const state = reactive(data()) //响应式数据
-
-        const instance: {
-            state: any,
-            isMounted: boolean,
-            vnode: vnode,
-            subTree: any,
-            update: (() => void) | null,
-        } = {
-            state,
-            isMounted: false,
-            vnode,
-            subTree: null,
-            update: null,
-        }
-
+        const { render } = vnode.type as VueComponent
         const componentUpdateFn = () => {
             if (!instance.isMounted) {
-                const subTree = render?.call(state, state) //render函数的this指向组件的状态
+                const subTree = render?.call(instance.proxy, instance.proxy) //render函数的this指向组件的状态
                 patch(null, subTree, container, anchor) //递归调用patch函数
                 instance.isMounted = true
                 instance.subTree = subTree
             } else {
-                const subTree = render?.call(state, state) //render函数的this指向组件的状态
+                const subTree = render?.call(instance.proxy, instance.proxy) //render函数的this指向组件的状态
                 patch(instance.subTree, subTree, container, anchor) //递归调用patch函数
                 instance.subTree = subTree
             }
         }
 
-
-        const effect = new ReactiveEffect(componentUpdateFn, () => { update() })
-
-        const update = () => {
-            effect.run()
-        }
-
-        instance.update = update
-
-        update()
+        const effect = new ReactiveEffect(componentUpdateFn, () => {
+            queueJob(update)
+        })
+        const update = (instance.update = () => effect.run());
+        update();
     }
+
+
+    const mountComponent = (vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
+
+        //创建组件实例
+        const instance = (vnode.component = createComponentInstance(vnode))
+
+        //给实例属性赋值
+        setupComponent(instance)
+
+        //创建effect
+        setupRenderEffect(instance, vnode, container, anchor)
+    }
+
 
     const processComponent = (n1: vnode | null, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
         if (n1 === null) {
             //挂载组件
-            // mountComponent(n2,container)
+            mountComponent(n2, container, anchor)
         } else {
             //更新组件
             // updateComponent(n1,n2)

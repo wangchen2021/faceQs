@@ -27,7 +27,7 @@ var romanToInt = function (s) {
     while (numArray.length > 0) {
         if (numArray.length === 1) {
             res = res + numArray[0]
-            break
+            numArray.shift()
         }
         else {
             if (numArray[0] >= numArray[1]) {

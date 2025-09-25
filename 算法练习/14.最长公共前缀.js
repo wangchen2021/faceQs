@@ -7,19 +7,22 @@
  * @return {string}
  */
 var longestCommonPrefix = function (strs) {
-    const length = strs.length
-    if (length === 1) return strs[0]
-    let res = ""
-    let firstStr = strs[0]
-    for (let i = 0; i < firstStr.length; i++) {
-        const refer = firstStr.charAt(i)
-        const newLength = strs.filter((item) => {
-            return item.startsWith(res + refer)
-        }).length
-        if (length != newLength) break
-        res = res + refer
+    let refer = strs[0]
+    while (refer && refer.length > 0) {
+        for (let i = 0; i < strs.length; i++) {
+            if (!strs[i].startsWith(refer)) {
+                break
+            } else {
+                if (i === strs.length - 1) {
+                    return refer
+                }
+            }
+        }
+        refer = refer.slice(0, refer.length - 1)
     }
-    return res
+    return ""
 }
+console.log(longestCommonPrefix(str));
 
-console.log(longestCommonPrefix(["flower", "flow", "flight"]));
+
+

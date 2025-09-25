@@ -1,53 +1,37 @@
 /**
- * @link https://leetcode.cn/problems/integer-to-roman/description/
- */
-
-/**
+ * @link https://leetcode.cn/problems/integer-to-roman/
  * @param {number} num
  * @return {string}
  */
 var intToRoman = function (num) {
-
-    let res = ""
-
-    const Roman = {
+    const RomanRecord = {
         1: "I",
+        4: "IV",
         5: "V",
+        9: "IX",
         10: "X",
+        40: "XL",
         50: "L",
+        90: "XC",
         100: "C",
+        400: "CD",
         500: "D",
+        900: "CM",
         1000: "M"
     }
-
-    let remain = num
-
-    Object.keys(Roman).reverse().forEach((key) => {
-        const times = Math.floor(remain / key)
-        res = getTimesStr(res, Roman[key], times)
-        remain = remain % key
-        const remainStr = remain.toString()
-        if (remainStr.startsWith("9")) {
-            const power = remainStr.length
-            remain = remain - 0.9 * Math.pow(10, power)
-            res = res + Roman[Math.pow(10, power - 1)] + Roman[Math.pow(10, power)]
+    const unit = Object.keys(RomanRecord).reverse()
+    let res = ""
+    let i = 0
+    while (num > 0) {
+        const value = unit[i]
+        if (value > num) {
+            i++
+            continue
         }
-        else if (remainStr.startsWith("4")) {
-            const power = remainStr.length
-            remain = remain - 0.4 * Math.pow(10, power)
-            res = res + Roman[Math.pow(10, power - 1)] + Roman[0.5 * Math.pow(10, power)]
-        }
-    })
-
-    function getTimesStr(res, str, times) {
-        for (let i = 0; i < times; i++) {
-            res = res + str
-        }
-        return res
+        num = num - value
+        res = res + RomanRecord[value]
     }
-
     return res
-
 };
 
-console.log(intToRoman(3749));
+console.log(intToRoman(1994));

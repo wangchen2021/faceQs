@@ -12,7 +12,7 @@ declare type VueComponent = {
 
 declare type vnode = {
     type: string | symbol | VueComponent, //节点类型
-    props?:  { [key: string | symbol]: any },
+    props?: Record<string | symbol, any>,
     children?: Array<vnode | string> | string,
     el: VueTMLElement | null, //真实节点
     shapeFlag: number, //标记节点类型
@@ -27,10 +27,11 @@ declare type ComponentInstance = {
     vnode: vnode,
     subTree: any,
     update: (() => void) | null,
-    props: { [key: string | symbol]: any },
-    attrs: { [key: string | symbol]: any },
-    propsOptions: { [key: string | symbol]: any },
-    proxy: { [key: string | symbol]: any },
-    component: ComponentInstance|null,
+    props: Record<string | symbol, any>,
+    attrs: Record<string | symbol, any>,
+    propsOptions: Record<string | symbol, any>,
+    proxy: Record<string | symbol, any>,
+    component: ComponentInstance | null,
     render?: Function,
+    next: vnode|null
 }

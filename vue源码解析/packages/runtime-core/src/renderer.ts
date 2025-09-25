@@ -262,6 +262,12 @@ export function createRenderer(renderOptions: any) {
         }
     }
 
+    const updateComponentPreRender = (instance: ComponentInstance, nextVNode: vnode) => {
+        instance.next = null
+        instance.vnode = nextVNode
+        updateProps(instance, instance.props, nextVNode.props)
+    }
+
     const setupRenderEffect = (instance: ComponentInstance, vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null) => {
         //挂载组件
         const { render } = vnode.type as VueComponent
@@ -272,6 +278,10 @@ export function createRenderer(renderOptions: any) {
                 instance.isMounted = true
                 instance.subTree = subTree
             } else {
+                const { next } = instance
+                if (next) {
+                    updateComponentPreRender(instance, next)
+                }
                 const subTree = render?.call(instance.proxy, instance.proxy) //render函数的this指向组件的状态
                 patch(instance.subTree, subTree, container, anchor) //递归调用patch函数
                 instance.subTree = subTree
@@ -298,6 +308,59 @@ export function createRenderer(renderOptions: any) {
         setupRenderEffect(instance, vnode, container, anchor)
     }
 
+    const hasPropsChanged = (oldProps: Record<string | symbol, any> | undefined, newProps: Record<string | symbol, any> | undefined) => {
+        let nKeys = Object.keys(newProps || {})
+        let oKeys = Object.keys(oldProps || {})
+        if (nKeys.length !== oKeys.length) {
+            return true
+        }
+
+        for (let i = 0; i < nKeys.length; i++) {
+            const key = nKeys[i]
+            if (newProps![key] !== oldProps![key]) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    const updateProps = (instance: ComponentInstance, preProps: Record<string | symbol, any> | undefined, nextProps: Record<string | symbol, any> | undefined) => {
+
+        if (hasPropsChanged(preProps, nextProps)) {
+            for (let key in nextProps) {
+                instance.props[key] = nextProps[key]
+            }
+
+            for (let key in preProps) {
+                if (!(key in nextProps!)) {
+                    delete instance.props[key]
+                }
+            }
+        }
+    }
+
+    const shouldUpdateComponent = (n1: vnode, n2: vnode) => {
+        const { props: preProps, children: prevChildren } = n1
+        const { props: nextProps, children: nextChildren } = n2
+        if (prevChildren || nextChildren) { // 只要有一个有插槽就一定更新
+            return true
+        }
+        if (preProps === nextProps) {
+            return false
+        }
+        return hasPropsChanged(preProps, nextProps)
+    }
+
+    const updateComponent = (n1: vnode, n2: vnode) => {
+        const instance = (n2.component = n1.component)! //复用组件实例 核心是为了复用dom
+        if (shouldUpdateComponent(n1, n2)) {
+            instance.next = n2
+            instance.update && instance.update()
+        }
+
+        // updateProps(instance, preProps, nextProps)
+    }
 
     const processComponent = (n1: vnode | null, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
         if (n1 === null) {
@@ -305,7 +368,7 @@ export function createRenderer(renderOptions: any) {
             mountComponent(n2, container, anchor)
         } else {
             //更新组件
-            // updateComponent(n1,n2)
+            updateComponent(n1, n2)
         }
     }
 

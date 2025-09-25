@@ -14,6 +14,7 @@ export function createComponentInstance(vnode: vnode) {
         propsOptions: vnodeType.props || {},
         proxy: {},
         component: null,
+        next: null
     }
     return instance
 }
@@ -77,7 +78,7 @@ export function setupComponent(instance: ComponentInstance) {
     initProps(instance, vnode.props)
     instance.proxy = new Proxy(instance, handler)
     vnode.component = instance
-    const { data, render } = vnode.type as VueComponent
+    const { data = () => { }, render } = vnode.type as VueComponent
     if (isFunction(data)) {
         instance.data = reactive(data.call(instance.proxy)) //data中的this指向组件实例
         instance.render = render

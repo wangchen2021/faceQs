@@ -2,14 +2,13 @@ export function patchEvent(el: VueTMLElement, key: string, nextValue: any) {
     //vue_event_invoker
     const invokers = el._vei || (el._vei = {})
     const eventName = key.slice(2).toLowerCase() //去掉on前缀
-
     const existingInvoker = invokers[key] //之前绑定的事件
 
     if (existingInvoker && nextValue) {
         //如果有旧的事件，并且有新的事件
         return existingInvoker.value = nextValue
     }
-
+    
     if (nextValue) {
         //如果有新的事件
         const invoker = (invokers[key] = createInvoker(nextValue))

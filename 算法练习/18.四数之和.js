@@ -1,39 +1,61 @@
 /**
- * @link https://leetcode.cn/problems/4sum/description/
- */
-
-/**
+ * 
+ * @link https://leetcode.cn/problems/4sum/
  * @param {number[]} nums
  * @param {number} target
  * @return {number[][]}
  */
 var fourSum = function (nums, target) {
+    nums.sort((a, b) => a - b)
+    const len = nums.length
     const res = []
-    nums = nums.sort((a, b) => a - b)
+    for (let i = 0; i < len - 3; i++) {
+        if (i > 0 && nums[i] === nums[i - 1]) continue
+        for (let j = i + 1; j < len - 2; j++) {
+            if (j > i + 1 && nums[j] === nums[j - 1]) continue
 
-    for (let p1 = 0; p1 < nums.length - 1; p1++) {
-        if (p1 > 0 && nums[p1] === nums[p1 - 1]) continue //相同数不处理
+            const min = nums[i] + nums[j] + nums[j + 1] + nums[j + 2]
+            const max = nums[i] + nums[j] + nums[len - 2] + nums[len - 1]
 
-        for (let p2 = p1 + 1; p2 < nums.length - 1; p2++) {
-            if (p2 > p1 + 1 && nums[p2] === nums[p2 - 1]) continue //相同数不处理
-
-            let p4 = nums.length - 1
-            for (let p3 = p2 + 1; p3 < p4; p3++) {
-                if (p3 > p2 + 1 && nums[p3] === nums[p3 - 1]) continue
-
-                const referValue = target - (nums[p1] + nums[p2] + nums[p3])
-                while (nums[p4] > referValue) {
-                    p4--
-                }
-
-                if (p4 <= p3) break
-
-                if (nums[p4] === referValue) {
-                    res.push([nums[p1], nums[p2], nums[p3], nums[p4]])
-                }
-
+            if (min > target) {
+                break
+            } else if (max < target) {
+                continue
             }
+
+            let start = j + 1
+            let end = len - 1
+            const refer = target - nums[i] - nums[j]
+
+            while (start < end) {
+                if (nums[start] + nums[end] > refer) {
+                    end = endMove(start, end)
+                } else if (nums[start] + nums[end] < refer) {
+                    start = startMove(start, end)
+                } else {
+                    res.push([nums[i], nums[j], nums[start], nums[end]])
+                    start = startMove(start, end)
+                    end = endMove(start, end)
+                }
+            }
+
         }
+    }
+
+    function startMove(start, end) {
+        while (nums[start] === nums[start + 1] && start < end) {
+            start++
+        }
+        start++
+        return start
+    }
+    
+    function endMove(start, end) {
+        while (nums[end] === nums[end - 1] && start < end) {
+            end--
+        }
+        end--
+        return end
     }
     return res
 };

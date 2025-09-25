@@ -270,10 +270,9 @@ export function createRenderer(renderOptions: any) {
 
     const setupRenderEffect = (instance: ComponentInstance, vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null) => {
         //挂载组件
-        const { render } = vnode.type as VueComponent
         const componentUpdateFn = () => {
             if (!instance.isMounted) {
-                const subTree = render?.call(instance.proxy, instance.proxy) //render函数的this指向组件的状态
+                const subTree = instance.render?.call(instance.proxy, instance.proxy) //render函数的this指向组件的状态
                 patch(null, subTree, container, anchor) //递归调用patch函数
                 instance.isMounted = true
                 instance.subTree = subTree
@@ -282,7 +281,7 @@ export function createRenderer(renderOptions: any) {
                 if (next) {
                     updateComponentPreRender(instance, next)
                 }
-                const subTree = render?.call(instance.proxy, instance.proxy) //render函数的this指向组件的状态
+                const subTree = instance.render?.call(instance.proxy, instance.proxy) //render函数的this指向组件的状态
                 patch(instance.subTree, subTree, container, anchor) //递归调用patch函数
                 instance.subTree = subTree
             }
@@ -358,8 +357,6 @@ export function createRenderer(renderOptions: any) {
             instance.next = n2
             instance.update && instance.update()
         }
-
-        // updateProps(instance, preProps, nextProps)
     }
 
     const processComponent = (n1: vnode | null, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
@@ -404,7 +401,10 @@ export function createRenderer(renderOptions: any) {
     const unmount = (vnode: vnode) => {
         if (vnode.type === Fragment) {
             return unmountChildren(vnode.children as Array<vnode>)
-        } else {
+        } else if (vnode.shapeFlag & ShapeFlags.COMPONENT) {
+            return unmount(vnode.component!.subTree!)
+        }
+        else {
             hostRemove(vnode.el!)
         }
     }

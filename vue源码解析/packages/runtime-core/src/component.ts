@@ -1,5 +1,5 @@
-import { reactive } from "@vue/reactivity"
-import { hasOwn, isFunction } from "@vue/shared"
+import { proxyRefs, reactive } from "@vue/reactivity"
+import { hasOwn, isFunction, isObject, ShapeFlags } from "@vue/shared"
 
 export function createComponentInstance(vnode: vnode) {
     const vnodeType = vnode.type as VueComponent
@@ -14,7 +14,9 @@ export function createComponentInstance(vnode: vnode) {
         propsOptions: vnodeType.props || {},
         proxy: {},
         component: null,
-        next: null
+        next: null,
+        setupState: {},
+        slots: {},
     }
     return instance
 }
@@ -42,25 +44,29 @@ const publicProperties = { // 组件实例的公开属性
     $el: (i: ComponentInstance) => i.vnode.el,
     $data: (i: ComponentInstance) => i.data,
     $props: (i: ComponentInstance) => i.props,
-    $attrs: (i: ComponentInstance) => i.attrs
+    $attrs: (i: ComponentInstance) => i.attrs,
+    $slots: (i: ComponentInstance) => i.slots,
 }
 
 const handler: ProxyHandler<ComponentInstance> = {
     get(target, key) {
-        const { data, props } = target
+        const { data, props, setupState } = target
         if (data && hasOwn(data, key)) {
             return data[key]
         }
         else if (hasOwn(props, key)) {
             return props[key]
+        } else if (setupState && hasOwn(setupState, key)) {
+            return setupState[key]
         }
+
         const publicGetter = publicProperties[key as keyof typeof publicProperties]
         if (publicGetter) {
             return publicGetter(target)
         }
     },
     set(target, key, value) {
-        const { data, props } = target
+        const { data, props, setupState } = target
         if (data && hasOwn(data, key)) {
             data[key] = value
         }
@@ -68,21 +74,59 @@ const handler: ProxyHandler<ComponentInstance> = {
             props[key] = value
             console.warn('不要修改props的值')
             return false
+        } else if (setupState && hasOwn(setupState, key)) {
+            setupState[key] = value
         }
         return true
+    }
+}
+
+function initSlots(instance: ComponentInstance, children: any) {
+    if (instance.vnode.shapeFlag & ShapeFlags.SLOTS_CHILDREN) {
+        instance.slots = children
+    } else {
+        instance.slots = {}
     }
 }
 
 export function setupComponent(instance: ComponentInstance) {
     const { vnode } = instance
     initProps(instance, vnode.props)
+    initSlots(instance, vnode.children)
     instance.proxy = new Proxy(instance, handler)
     vnode.component = instance
-    const { data = () => { }, render } = vnode.type as VueComponent
+    const { data = () => { }, render, setup } = vnode.type as VueComponent
+    //处理setup
+    const setupContext = {
+        attrs: instance.attrs,
+        slots: instance.slots,
+        emit: (event: string, ...args: any[]) => {
+            const eventName = `on${event[0].toUpperCase()}${event.slice(1)}`
+            const handler = vnode.props![eventName]
+            if (handler) {
+                handler(...args)
+            }
+        },
+        expose: (exposed: any) => {
+            instance.exposed = exposed
+        }
+    }
+    if (setup) {
+        const setupResult = setup(instance.props, setupContext)
+        if (isFunction(setupResult)) {
+            instance.render = setupResult
+        } else if (isObject(setupResult)) {
+            instance.setupState = proxyRefs(setupResult) //返回值脱ref
+        }
+    }
+
     if (isFunction(data)) {
         instance.data = reactive(data.call(instance.proxy)) //data中的this指向组件实例
-        instance.render = render
     } else {
         console.warn("data必须是函数");
+    }
+
+    if (!instance.render) {
+        instance.render = render
     }
 }

@@ -20,7 +20,13 @@ export function createVnode(type: any, props?: any, children?: any) {
         if (Array.isArray(children)) {
             vnode.shapeFlag |= ShapeFlags.ARRAY_CHILDREN // 数组子节点
             vnode.children = children
-        } else {
+        } else if (isObject(children)) {
+            if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+                // 组件 + 对象 = 插槽
+                vnode.shapeFlag |= ShapeFlags.SLOTS_CHILDREN // 插槽子节点
+            }
+        }
+        else {
             vnode.shapeFlag |= ShapeFlags.TEXT_CHILDREN // 文本子节点
             vnode.children = children
         }

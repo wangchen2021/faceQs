@@ -8,6 +8,7 @@ declare type VueComponent = {
     data?: Function, //组件的data数据
     render?: Function, //组件的render函数
     props: any, //组件的props选项
+    setup?: Function //组合式API
 }
 
 declare type vnode = {
@@ -33,5 +34,8 @@ declare type ComponentInstance = {
     proxy: Record<string | symbol, any>,
     component: ComponentInstance | null,
     render?: Function,
-    next: vnode|null
+    next: vnode | null,
+    setupState: Record<string | symbol, any>,
+    slots: Record<string, Function>,
+    exposed?: Record<string, any>,
 }

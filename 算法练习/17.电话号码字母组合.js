@@ -8,6 +8,8 @@
  */
 var letterCombinations = function (digits) {
 
+    if (digits.length === 0) return []
+
     let res = []
 
     const digitsMap = {
@@ -21,32 +23,27 @@ var letterCombinations = function (digits) {
         "9": "wxyz"
     }
     const gropStrs = []
+    const len = digits.length
 
-
-    for (let i = 0; i < digits.length; i++) {
+    for (let i = 0; i < len; i++) {
         gropStrs.push(digitsMap[digits.charAt(i)])
     }
 
-    for (let i = 0; i < gropStrs.length; i++) {
-        const targetStrs = gropStrs[i]
-        res = strGruops(targetStrs, res)
-    }
-
-    function strGruops(targetStrs, res = []) {
-
-        let groupRes = []
-        for (let j = 0; j < targetStrs.length; j++) {
-            if (res.length > 0) {
-                for (let p = 0; p < res.length; p++) {
-                    groupRes.push(res[p] + targetStrs[j])
-                }
-            } else {
-                groupRes.push(targetStrs[j])
-            }
-
+    function dfs(floor, path) {
+        if (floor === len) {
+            res.push(path)
+            return
         }
-        return groupRes
+        const floorStr = gropStrs[floor]
+        const prePath = path
+        for (let i = 0; i < floorStr.length; i++) {
+            path = path + floorStr.charAt(i)
+            dfs(floor + 1, path)
+            path = prePath
+        }
     }
+
+    dfs(0, "")
 
     return res
 

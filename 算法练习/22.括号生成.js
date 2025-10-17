@@ -47,39 +47,35 @@
 // };
 
 // 1,2, 结束 树结构 一层层分析
-// 1 (  left<n
-// 2 )  right<left
-// end right = n
+// 截止条件 path len=2n
+// ( left < n
+// ) right < left
 /**
  * @param {number} n
  * @return {string[]}
  */
 var generateParenthesis = function (n) {
-    let buffer = []
-    let res = []
-    function callBack(left, rigth) {
+    const res = []
 
-        if (rigth === n) {
-            res.push(buffer.join(""))
+    const dfs = (path, left, right) => {
+        if (path.length === n * 2) {
+            res.push(path)
+            return
         }
 
         if (left < n) {
-            buffer.push("(")
-            callBack(left + 1, rigth)
-            buffer.pop()
+            dfs(path + "(", left + 1, right)
         }
 
-        if (rigth < left) {
-            buffer.push(")")
-            callBack(left, rigth + 1)
-            buffer.pop()
+        if (right < left) {
+            dfs(path + ")", left, right + 1)
         }
-
     }
 
-    callBack(0, 0)
+    dfs("", 0, 0)
 
     return res
+
 };
 
 

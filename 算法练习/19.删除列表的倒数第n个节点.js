@@ -17,23 +17,19 @@ import { ListNode } from "./common";
  * @return {ListNode}
  */
 var removeNthFromEnd = function (head, n) {
-    let preHead = head
-    let endHead = head
-
-    for (let i = 0; i < n - 1; i++) {
-        endHead = endHead.next
-        if (!endHead) return head // n大于总长度
+    let origin = new ListNode(0, head)
+    let pre = origin
+    let cur = origin
+    for (let i = 0; i < n; i++) {
+        cur = cur.next
+        if (!cur) return origin.next
     }
-
-    //删除首个 无法记录pre
-    endHead = endHead.next
-    if (!endHead) return head.next
-
-    while (endHead && endHead.next) {
-        endHead = endHead.next
-        preHead = preHead.next
+    while (cur.next) {
+        cur = cur.next
+        pre = pre.next
     }
+    pre.next = pre.next.next
 
-    preHead.next = preHead.next.next
-    return head
+    return origin.next
+
 };

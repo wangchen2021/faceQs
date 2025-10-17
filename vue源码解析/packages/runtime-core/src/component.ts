@@ -96,23 +96,25 @@ export function setupComponent(instance: ComponentInstance) {
     instance.proxy = new Proxy(instance, handler)
     vnode.component = instance
     const { data = () => { }, render, setup } = vnode.type as VueComponent
-    //处理setup
-    const setupContext = {
-        attrs: instance.attrs,
-        slots: instance.slots,
-        emit: (event: string, ...args: any[]) => {
-            const eventName = `on${event[0].toUpperCase()}${event.slice(1)}`
-            const handler = vnode.props![eventName]
-            if (handler) {
-                handler(...args)
-            }
-        },
-        expose: (exposed: any) => {
-            instance.exposed = exposed
-        }
-    }
     if (setup) {
+        //处理setup
+        const setupContext = {
+            attrs: instance.attrs,
+            slots: instance.slots,
+            emit: (event: string, ...args: any[]) => {
+                const eventName = `on${event[0].toUpperCase()}${event.slice(1)}`
+                const handler = vnode.props![eventName]
+                if (handler) {
+                    handler(...args)
+                }
+            },
+            expose: (exposed: any) => {
+                instance.exposed = exposed
+            }
+        }
+        setCurrentInstance(instance)
         const setupResult = setup(instance.props, setupContext)
+        resetCurrentInstance()
         if (isFunction(setupResult)) {
             instance.render = setupResult
         } else if (isObject(setupResult)) {
@@ -129,4 +131,19 @@ export function setupComponent(instance: ComponentInstance) {
     if (!instance.render) {
         instance.render = render
     }
+
+}
+
+export let currentInstance: ComponentInstance | null = null
+
+export function getCurrentInstance() {
+    return currentInstance
+}
+
+export function setCurrentInstance(instance: ComponentInstance | null) {
+    currentInstance = instance
+}
+
+export function resetCurrentInstance() {
+    currentInstance = null
 }

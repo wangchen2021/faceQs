@@ -1,9 +1,10 @@
 import { hasOwn, ShapeFlags } from "@vue/shared";
 import { Fragment, isSameVnode, Text } from "./createVnode";
 import { getSequence } from "./seq";
-import { reactive, ReactiveEffect } from "@vue/reactivity";
+import { isRef, reactive, ReactiveEffect } from "@vue/reactivity";
 import { queueJob } from "./scheduler";
 import { createComponentInstance, setupComponent } from "./component";
+import { invokeArrayFns } from "./apiLifecycle";
 
 export function createRenderer(renderOptions: any) {
 
@@ -271,19 +272,32 @@ export function createRenderer(renderOptions: any) {
     const setupRenderEffect = (instance: ComponentInstance, vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null) => {
         //挂载组件
         const componentUpdateFn = () => {
+            const { bm, m } = instance
             if (!instance.isMounted) {
+                if (bm) {
+                    invokeArrayFns(bm)
+                }
                 const subTree = instance.render?.call(instance.proxy, instance.proxy) //render函数的this指向组件的状态
                 patch(null, subTree, container, anchor) //递归调用patch函数
                 instance.isMounted = true
                 instance.subTree = subTree
+                if (m) {
+                    invokeArrayFns(m)
+                }
             } else {
-                const { next } = instance
+                const { next, bu, u } = instance
                 if (next) {
                     updateComponentPreRender(instance, next)
+                }
+                if (bu) {
+                    invokeArrayFns(bu)
                 }
                 const subTree = instance.render?.call(instance.proxy, instance.proxy) //render函数的this指向组件的状态
                 patch(instance.subTree, subTree, container, anchor) //递归调用patch函数
                 instance.subTree = subTree
+                if (u) {
+                    invokeArrayFns(u)
+                }
             }
         }
 
@@ -379,7 +393,7 @@ export function createRenderer(renderOptions: any) {
             unmount(n1)
             n1 = null // 重置 n1 为 null
         }
-        const { type, shapeFlag } = n2
+        const { type, shapeFlag, ref } = n2
         switch (type) {
             case Text:
                 processText(n1, n2, container)
@@ -393,9 +407,22 @@ export function createRenderer(renderOptions: any) {
                 } else if (shapeFlag & ShapeFlags.COMPONENT) {
                     //处理组件
                     processComponent(n1, n2, container, anchor)
+                } else if (shapeFlag & ShapeFlags.TELEPORT) {
+
                 }
         }
 
+        if (ref) {
+            setRef(ref, n2)
+        }
+
+    }
+
+    function setRef(ref: any, vnode: vnode) {
+        let value = vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT ? (vnode.component?.exposed || vnode.component?.proxy) : vnode.el
+        if (isRef(ref)) {
+            ref.value = value
+        }
     }
 
     const unmount = (vnode: vnode) => {

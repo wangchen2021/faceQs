@@ -1,9 +1,14 @@
-//操作节点属性
+/**
+ * @description vue扩展HTMLElement类型
+ */
 declare interface VueTMLElement extends HTMLElement {
     _vei?: Record<string, any>,
     _vnode?: any //虚拟节点
 }
 
+/**
+ * @description 组件类型
+ */
 declare type VueComponent = {
     data?: Function, //组件的data数据
     render?: Function, //组件的render函数
@@ -11,6 +16,10 @@ declare type VueComponent = {
     setup?: Function //组合式API
 }
 
+
+/**
+ * @description 虚拟节点类型
+ */
 declare type vnode = {
     type: string | symbol | VueComponent, //节点类型
     props?: Record<string | symbol, any>,
@@ -20,8 +29,13 @@ declare type vnode = {
     key?: string | number, //唯一标识
     __v_isVNode?: true, //标识是虚拟节点
     component?: ComponentInstance //组件实例
+    ref?: any //ref
 }
 
+
+/**
+ * @description 组件实例类型
+ */
 declare type ComponentInstance = {
     data: any,
     isMounted: boolean,
@@ -38,4 +52,12 @@ declare type ComponentInstance = {
     setupState: Record<string | symbol, any>,
     slots: Record<string, Function>,
     exposed?: Record<string, any>,
+    bc?: Array<Function>, //beforeCreate
+    c?: Array<Function>, //created
+    bm?: Array<Function>, //beforeMount
+    m?: Array<Function>, //mounted
+    bu?: Array<Function>, //beforeUpdate
+    u?: Array<Function>, //updated
+    bum?: Array<Function>, //beforeUnmount
+    um?: Array<Function>, //unmounted
 }

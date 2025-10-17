@@ -17,29 +17,25 @@ import { ListNode } from "./common";
  * @return {ListNode}
  */
 var mergeTwoLists = function (list1, list2) {
-    let head = new ListNode()
-    let res = head
-    while (list1 && list2) {
-        if (list1.val < list2.val) {
-            head.next = list1
+    let pre = new ListNode()
+    let p = pre
+    while (list1 || list2) {
+        if (!list1) {
+            p.next = list2
+            list2 = list2.next
+        } else if (!list2) {
+            p.next = list1
             list1 = list1.next
         } else {
-            head.next = list2
-            list2 = list2.next
+            if (list1.val > list2.val) {
+                p.next = list2
+                list2 = list2.next
+            } else {
+                p.next = list1
+                list1 = list1.next
+            }
         }
-        head = head.next
+        p = p.next
     }
-
-    while (list1) {
-        head.next = list1
-        list1 = list1.next
-        head = head.next
-    }
-
-    while (list2) {
-        head.next = list2
-        list2 = list2.next
-        head = head.next
-    }
-    return res.next
+    return pre.next
 };

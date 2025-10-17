@@ -16,38 +16,34 @@ import { ListNode, toListNode, showListNodeRes } from "./common.js";
  * @return {ListNode}
  */
 var mergeKLists = function (lists) {
-    let head = new ListNode(-Infinity)
-    for (let list of lists) {
-        head = mergeTwoLists(head, list)
-        showListNodeRes(head)
-    }
+    let pre = lists[0]
+
     function mergeTwoLists(l1, l2) {
-        let head = new ListNode()
-        let res = head
+        let pre = new ListNode()
+        let p = pre
         while (l1 && l2) {
-            if (l1.val <= l2.val) {
-                head.next = l1
-                l1 = l1.next
-                head = head.next
-            } else {
-                head.next = l2
+            if (l1.val > l2.val) {
+                p.next = l2
                 l2 = l2.next
-                head = head.next
+            } else {
+                p.next = l1
+                l1 = l1.next
             }
+            p = p.next
         }
-        while (l1) {
-            head.next = l1
-            l1 = l1.next
-            head = head.next
-        }
-        while (l2) {
-            head.next = l2
-            l2 = l2.next
-            head = head.next
-        }
-        return res.next
+        p.next = l1 || l2
+        return pre.next
     }
-    return head.next
+
+    function merge(left,ritht){
+        if(left===ritht) return lists[left]
+        if(left>ritht) return null
+        const mid= (left+ritht)>>1
+        return mergeTwoLists(merge(left,mid),merge(mid+1,ritht)) 
+    }
+
+    return merge(0,lists.length-1)
+
 };
 
 showListNodeRes(mergeKLists([toListNode([2]), toListNode([]), toListNode([-1])]));

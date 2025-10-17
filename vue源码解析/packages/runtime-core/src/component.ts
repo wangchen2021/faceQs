@@ -1,7 +1,7 @@
 import { proxyRefs, reactive } from "@vue/reactivity"
 import { hasOwn, isFunction, isObject, ShapeFlags } from "@vue/shared"
 
-export function createComponentInstance(vnode: vnode) {
+export function createComponentInstance(vnode: vnode,parentComponent:ComponentInstance|null) {
     const vnodeType = vnode.type as VueComponent
     const instance: ComponentInstance = {
         data: null,
@@ -17,6 +17,8 @@ export function createComponentInstance(vnode: vnode) {
         next: null,
         setupState: {},
         slots: {},
+        parent: parentComponent,
+        provides: parentComponent ? parentComponent.provides : {},
     }
     return instance
 }

@@ -1,5 +1,5 @@
 import { hasOwn, ShapeFlags } from "@vue/shared";
-import { Fragment, isSameVnode, Text } from "./createVnode";
+import { createVnode, Fragment, isSameVnode, Text } from "./createVnode";
 import { getSequence } from "./seq";
 import { isRef, reactive, ReactiveEffect } from "@vue/reactivity";
 import { queueJob } from "./scheduler";
@@ -20,15 +20,15 @@ export function createRenderer(renderOptions: any) {
         patchProp: hostPatchProp,
     } = renderOptions
 
-    const mountChildren = (children: any, container: VueTMLElement) => {
+    const mountChildren = (children: any, container: VueTMLElement, parentComponent: ComponentInstance | null) => {
 
         for (let i = 0; i < children.length; i++) {
-            patch(null, children[i], container) // 递归调用patch函数处理子节点
+            patch(null, children[i], container, null, parentComponent) // 递归调用patch函数处理子节点
         }
 
     }
 
-    const mountElement = (vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
+    const mountElement = (vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null = null, parentComponent: ComponentInstance | null) => {
 
         const { type, props, children, shapeFlag } = vnode
 
@@ -44,17 +44,25 @@ export function createRenderer(renderOptions: any) {
         if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
             hostSetElementText(el, children) // 设置文本内容
         } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-            mountChildren(children, el) // 递归处理子节点   
+            mountChildren(children, el, parentComponent) // 递归处理子节点   
         }
 
         hostInsert(el, container, anchor) // 插入到容器中
     }
 
-    const processElement = (n1: vnode | null, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
+    const processElement = (n1: vnode | null, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null = null, parentComponent: ComponentInstance | null) => {
+        const newChildren = n2.children
+        if (newChildren && Array.isArray(newChildren)) {
+            for (let i = 0; i < newChildren.length; i++) {
+                if (typeof newChildren[i] === 'string' || typeof newChildren[i] === 'number') {
+                    newChildren[i] = createVnode(Text, null, newChildren[i])
+                }
+            }
+        }
         if (n1 === null) {
-            mountElement(n2, container, anchor)
+            mountElement(n2, container, anchor, parentComponent)
         } else {
-            patchElement(n1, n2, container)
+            patchElement(n1, n2, container, parentComponent)
         }
     }
 
@@ -90,7 +98,7 @@ export function createRenderer(renderOptions: any) {
             const n1 = c1[i]
             const n2 = c2[i]
             if (isSameVnode(n1, n2)) {
-                patch(n1, n2, el) // 如果新旧节点相同，递归比较
+                patch(n1, n2, el, null) // 如果新旧节点相同，递归比较
             } else {
                 break // 如果不相同，停止比较
             }
@@ -102,7 +110,7 @@ export function createRenderer(renderOptions: any) {
             const n1 = c1[e1]
             const n2 = c2[e2]
             if (isSameVnode(n1, n2)) {
-                patch(n1, n2, el) // 如果新旧节点相同，递归比较
+                patch(n1, n2, el, null) // 如果新旧节点相同，递归比较
             } else {
                 break // 如果不相同，停止比较
             }
@@ -160,8 +168,6 @@ export function createRenderer(renderOptions: any) {
 
             let increasingNewIndexSequence = getSequence(newIndexToOldIndexMap) // 获取最长递增子序列 [2,3,6,7]
 
-            console.log(newIndexToOldIndexMap, increasingNewIndexSequence);
-
             let j = increasingNewIndexSequence.length - 1
 
             for (let i = toBePatched - 1; i > 0; i--) {
@@ -182,7 +188,7 @@ export function createRenderer(renderOptions: any) {
         }
     }
 
-    const patchChildren = (n1: vnode, n2: vnode, el: VueTMLElement) => {
+    const patchChildren = (n1: vnode, n2: vnode, el: VueTMLElement, parentComponent: ComponentInstance | null) => {
         // 孩子的三种情况 text array null
         const c1 = n1.children
         const c2 = n2.children
@@ -222,7 +228,7 @@ export function createRenderer(renderOptions: any) {
                 }
 
                 if (nextShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-                    mountChildren(c2 as Array<vnode>, el) // 挂载新节点的子节点
+                    mountChildren(c2 as Array<vnode>, el, parentComponent) // 挂载新节点的子节点
                 }
             }
         }
@@ -235,12 +241,12 @@ export function createRenderer(renderOptions: any) {
      * @param n2 新节点
      * @param container 容器
      */
-    const patchElement = (n1: vnode, n2: vnode, container: VueTMLElement) => {
+    const patchElement = (n1: vnode, n2: vnode, container: VueTMLElement, parentComponent: ComponentInstance | null) => {
         let el = n2.el = n1.el // 复用旧节点的真实元素
         let oldProps = n1.props || {}
         let newProps = n2.props || {}
         patchProps(oldProps, newProps, el as VueTMLElement) // 更新属性
-        patchChildren(n1, n2, el as VueTMLElement) // 更新子节点
+        patchChildren(n1, n2, el as VueTMLElement, parentComponent) // 更新子节点
     }
 
     const processText = (n1: vnode | null, n2: vnode, container: VueTMLElement) => {
@@ -255,11 +261,12 @@ export function createRenderer(renderOptions: any) {
         }
     }
 
-    const processFragment = (n1: vnode | null, n2: vnode, container: VueTMLElement) => {
+
+    const processFragment = (n1: vnode | null, n2: vnode, container: VueTMLElement, parentComponent: ComponentInstance | null) => {
         if (n1 === null) {
-            mountChildren(n2.children as Array<vnode>, container)
+            mountChildren(n2.children as Array<vnode>, container, parentComponent)
         } else {
-            patchChildren(n1, n2, container)
+            patchChildren(n1, n2, container, parentComponent)
         }
     }
 
@@ -267,6 +274,16 @@ export function createRenderer(renderOptions: any) {
         instance.next = null
         instance.vnode = nextVNode
         updateProps(instance, instance.props, nextVNode.props)
+    }
+
+    const renderComponent = (instance: ComponentInstance) => {
+        const { render, vnode, proxy, attrs } = instance
+        if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+            return render?.call(proxy, proxy)
+        } else if (vnode.shapeFlag & ShapeFlags.FUNCTIONAL_COMPONENT) {
+            const renderFn = vnode.type as Function
+            return renderFn(attrs)
+        }
     }
 
     const setupRenderEffect = (instance: ComponentInstance, vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null) => {
@@ -277,8 +294,8 @@ export function createRenderer(renderOptions: any) {
                 if (bm) {
                     invokeArrayFns(bm)
                 }
-                const subTree = instance.render?.call(instance.proxy, instance.proxy) //render函数的this指向组件的状态
-                patch(null, subTree, container, anchor) //递归调用patch函数
+                const subTree = renderComponent(instance) //调用组件的render函数，返回虚拟节点
+                patch(null, subTree, container, anchor, instance) //递归调用patch函数
                 instance.isMounted = true
                 instance.subTree = subTree
                 if (m) {
@@ -292,8 +309,8 @@ export function createRenderer(renderOptions: any) {
                 if (bu) {
                     invokeArrayFns(bu)
                 }
-                const subTree = instance.render?.call(instance.proxy, instance.proxy) //render函数的this指向组件的状态
-                patch(instance.subTree, subTree, container, anchor) //递归调用patch函数
+                const subTree = renderComponent(instance) //调用组件的render函数，返回虚拟节点
+                patch(instance.subTree, subTree, container, anchor, instance) //递归调用patch函数
                 instance.subTree = subTree
                 if (u) {
                     invokeArrayFns(u)
@@ -309,10 +326,10 @@ export function createRenderer(renderOptions: any) {
     }
 
 
-    const mountComponent = (vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
+    const mountComponent = (vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null = null, parentComponent: ComponentInstance | null) => {
 
         //创建组件实例
-        const instance = (vnode.component = createComponentInstance(vnode))
+        const instance = (vnode.component = createComponentInstance(vnode, parentComponent))
 
         //给实例属性赋值
         setupComponent(instance)
@@ -373,17 +390,17 @@ export function createRenderer(renderOptions: any) {
         }
     }
 
-    const processComponent = (n1: vnode | null, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
+    const processComponent = (n1: vnode | null, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null = null, parentComponent: ComponentInstance | null) => {
         if (n1 === null) {
             //挂载组件
-            mountComponent(n2, container, anchor)
+            mountComponent(n2, container, anchor, parentComponent)
         } else {
             //更新组件
             updateComponent(n1, n2)
         }
     }
 
-    const patch = (n1: vnode | null, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null = null) => {
+    const patch = (n1: vnode | null, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null = null, parentComponent: ComponentInstance | null = null) => {
 
         // 这里可以实现虚拟 DOM 的 diff 算法
         // 比较新旧虚拟节点，更新真实 DOM
@@ -399,14 +416,14 @@ export function createRenderer(renderOptions: any) {
                 processText(n1, n2, container)
                 break
             case Fragment:
-                processFragment(n1, n2, container)
+                processFragment(n1, n2, container, parentComponent)
                 break;
             default:
                 if (shapeFlag & ShapeFlags.ELEMENT) {
-                    processElement(n1, n2, container, anchor) // 处理元素节点
+                    processElement(n1, n2, container, anchor, parentComponent) // 处理元素节点
                 } else if (shapeFlag & ShapeFlags.COMPONENT) {
                     //处理组件
-                    processComponent(n1, n2, container, anchor)
+                    processComponent(n1, n2, container, anchor, parentComponent)
                 } else if (shapeFlag & ShapeFlags.TELEPORT) {
 
                 }
@@ -437,13 +454,13 @@ export function createRenderer(renderOptions: any) {
     }
 
     // 渲染函数 将虚拟节点渲染到真实 DOM 上
-    const render = (vnode: vnode | null, container: VueTMLElement) => {
+    const render = (vnode: vnode | null, container: VueTMLElement, parentComponent: ComponentInstance | null) => {
         if (vnode === null) {
             if (container._vnode) {
                 unmount(container._vnode)
             }
         } else {
-            patch(container._vnode || null, vnode, container)
+            patch(container._vnode || null, vnode, container, null, parentComponent)
             container._vnode = vnode // 保存当前容器的虚拟节点
         }
     }

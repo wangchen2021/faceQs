@@ -21,7 +21,7 @@ declare type VueComponent = {
  * @description 虚拟节点类型
  */
 declare type vnode = {
-    type: string | symbol | VueComponent, //节点类型
+    type: string | symbol | VueComponent | Function, //节点类型
     props?: Record<string | symbol, any>,
     children?: Array<vnode | string> | string,
     el: VueTMLElement | null, //真实节点
@@ -60,4 +60,6 @@ declare type ComponentInstance = {
     u?: Array<Function>, //updated
     bum?: Array<Function>, //beforeUnmount
     um?: Array<Function>, //unmounted
+    parent: ComponentInstance | null,
+    provides: Record<string | symbol, any>,
 }

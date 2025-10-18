@@ -17,11 +17,17 @@ declare type VueComponent = {
 }
 
 
+declare type TeleportProps = {
+    __isTeleport: true,
+    process: Function,
+    remove: Function,
+}
+
 /**
  * @description 虚拟节点类型
  */
 declare type vnode = {
-    type: string | symbol | VueComponent | Function, //节点类型
+    type: string | symbol | VueComponent | Function | TeleportProps, //节点类型
     props?: Record<string | symbol, any>,
     children?: Array<vnode | string> | string,
     el: VueTMLElement | null, //真实节点
@@ -29,7 +35,8 @@ declare type vnode = {
     key?: string | number, //唯一标识
     __v_isVNode?: true, //标识是虚拟节点
     component?: ComponentInstance //组件实例
-    ref?: any //ref
+    ref?: any, //ref
+    target?: VueTMLElement //teleport目标容器
 }
 
 

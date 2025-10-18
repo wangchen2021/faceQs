@@ -5,6 +5,7 @@ import { isRef, reactive, ReactiveEffect } from "@vue/reactivity";
 import { queueJob } from "./scheduler";
 import { createComponentInstance, setupComponent } from "./component";
 import { invokeArrayFns } from "./apiLifecycle";
+import { h } from "vue";
 
 export function createRenderer(renderOptions: any) {
 
@@ -21,7 +22,7 @@ export function createRenderer(renderOptions: any) {
     } = renderOptions
 
     const mountChildren = (children: any, container: VueTMLElement, parentComponent: ComponentInstance | null) => {
-
+        normalizeTextChildren(children)
         for (let i = 0; i < children.length; i++) {
             patch(null, children[i], container, null, parentComponent) // 递归调用patch函数处理子节点
         }
@@ -188,14 +189,21 @@ export function createRenderer(renderOptions: any) {
         }
     }
 
+    const normalizeTextChildren = (children: any[]) => {
+        for (let i = 0; i < children.length; i++) {
+            if (typeof children[i] === 'string' || typeof children[i] === 'number') {
+                children[i] = createVnode(Text, null, children[i])
+            }
+        }
+    }
+
     const patchChildren = (n1: vnode, n2: vnode, el: VueTMLElement, parentComponent: ComponentInstance | null) => {
         // 孩子的三种情况 text array null
+        normalizeTextChildren(n2.children as any[])
         const c1 = n1.children
         const c2 = n2.children
-
         const prevShapeFlag = n1.shapeFlag
         const nextShapeFlag = n2.shapeFlag
-
         // 1. 新节点是文本
         if (nextShapeFlag & ShapeFlags.TEXT_CHILDREN) {
 
@@ -421,11 +429,21 @@ export function createRenderer(renderOptions: any) {
             default:
                 if (shapeFlag & ShapeFlags.ELEMENT) {
                     processElement(n1, n2, container, anchor, parentComponent) // 处理元素节点
-                } else if (shapeFlag & ShapeFlags.COMPONENT) {
+                }
+                else if (shapeFlag & ShapeFlags.TELEPORT) {
+                    const teleportProps = type as TeleportProps
+                    teleportProps.process(n1, n2, container, anchor, parentComponent, {
+                        mountChildren,
+                        patchChildren,
+                        //将组件或者dom移动到目标dom容器中
+                        move(vnode: vnode, container: VueTMLElement, anchor: HTMLElement | null) {
+                            hostInsert(vnode.component ? vnode.component.subTree.el : vnode.el, container, anchor)
+                        },
+                    })
+                }
+                else if (shapeFlag & ShapeFlags.COMPONENT) {
                     //处理组件
                     processComponent(n1, n2, container, anchor, parentComponent)
-                } else if (shapeFlag & ShapeFlags.TELEPORT) {
-
                 }
         }
 
@@ -445,8 +463,13 @@ export function createRenderer(renderOptions: any) {
     const unmount = (vnode: vnode) => {
         if (vnode.type === Fragment) {
             return unmountChildren(vnode.children as Array<vnode>)
-        } else if (vnode.shapeFlag & ShapeFlags.COMPONENT) {
+        }
+        else if (vnode.shapeFlag & ShapeFlags.COMPONENT) {
             return unmount(vnode.component!.subTree!)
+        }
+        else if (vnode.shapeFlag & ShapeFlags.TELEPORT) {
+            const teleportProps = vnode.type as TeleportProps
+            teleportProps.remove(vnode, unmountChildren)
         }
         else {
             hostRemove(vnode.el!)

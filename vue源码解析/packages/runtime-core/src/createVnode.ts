@@ -7,14 +7,11 @@ export const Fragment = Symbol('Fragment')
 
 export function createVnode(type: any, props?: any, children?: any) {
     const shapeFlag =
-        isString(type) ?
-            ShapeFlags.ELEMENT :
-            isTeleport(type) ?
-                ShapeFlags.TELEPORT :
-                isObject(type) ?
-                    ShapeFlags.STATEFUL_COMPONENT : isFunction(type) ?
-                        ShapeFlags.FUNCTIONAL_COMPONENT :
-                        0
+        isString(type)
+            ? ShapeFlags.ELEMENT : isTeleport(type)
+                ? ShapeFlags.TELEPORT : isObject(type)
+                    ? ShapeFlags.STATEFUL_COMPONENT : isFunction(type)
+                        ? ShapeFlags.FUNCTIONAL_COMPONENT : 0
 
     const vnode: vnode = {
         type,

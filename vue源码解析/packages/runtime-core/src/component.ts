@@ -1,7 +1,7 @@
 import { proxyRefs, reactive } from "@vue/reactivity"
 import { hasOwn, isFunction, isObject, ShapeFlags } from "@vue/shared"
 
-export function createComponentInstance(vnode: vnode,parentComponent:ComponentInstance|null) {
+export function createComponentInstance(vnode: vnode, parentComponent: ComponentInstance | null) {
     const vnodeType = vnode.type as VueComponent
     const instance: ComponentInstance = {
         data: null,
@@ -19,6 +19,7 @@ export function createComponentInstance(vnode: vnode,parentComponent:ComponentIn
         slots: {},
         parent: parentComponent,
         provides: parentComponent ? parentComponent.provides : {},
+        ctx: {},//上下文 如果是KeepAlive组件会用到 将dom操作挂载到ctx上
     }
     return instance
 }
@@ -118,7 +119,7 @@ export function setupComponent(instance: ComponentInstance) {
         const setupResult = setup(instance.props, setupContext)
         resetCurrentInstance()
         if (isFunction(setupResult)) {
-            instance.render = setupResult
+            instance.render = setupResult  
         } else if (isObject(setupResult)) {
             instance.setupState = proxyRefs(setupResult) //返回值脱ref
         }

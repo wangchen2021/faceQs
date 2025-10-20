@@ -8,4 +8,6 @@ export enum ShapeFlags {
     TELEPORT = 1 << 6, // 1 << 6
     SUSPENSE = 1 << 7, // 1 << 7
     COMPONENT = ShapeFlags.STATEFUL_COMPONENT | ShapeFlags.FUNCTIONAL_COMPONENT, // 组件
+    COMPONENT_SHOULD_KEEP_ALIVE = 1 << 8, // 1 << 8
+    COMPONENT_KEPT_ALIVE = 1 << 9, // 1 << 9
 }

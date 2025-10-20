@@ -1,5 +1,5 @@
 import { isFunction, isObject, isString, ShapeFlags } from "@vue/shared"
-import { isTeleport } from "./teleport"
+import { isTeleport } from "./components/Teleport"
 
 export const Text = Symbol('Text')
 
@@ -39,7 +39,6 @@ export function createVnode(type: any, props?: any, children?: any) {
             vnode.children = children
         }
     }
-
     return vnode
 }
 

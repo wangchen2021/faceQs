@@ -69,4 +69,5 @@ declare type ComponentInstance = {
     um?: Array<Function>, //unmounted
     parent: ComponentInstance | null,
     provides: Record<string | symbol, any>,
+    ctx: Record<string, any>,
 }

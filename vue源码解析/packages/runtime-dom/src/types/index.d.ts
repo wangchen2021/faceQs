@@ -37,6 +37,8 @@ declare type vnode = {
     component?: ComponentInstance //组件实例
     ref?: any, //ref
     target?: VueTMLElement //teleport目标容器
+    patchFlag:any,
+    dynamicChildren?:Array
 }
 
 

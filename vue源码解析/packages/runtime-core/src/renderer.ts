@@ -1,5 +1,5 @@
 import { hasOwn, ShapeFlags } from "@vue/shared";
-import { createVnode, Fragment, isSameVnode, Text } from "./createVnode";
+import { createVnode, Fragment, isSameVnode, PatchFlags, Text } from "./createVnode";
 import { getSequence } from "./seq";
 import { isRef, reactive, ReactiveEffect } from "@vue/reactivity";
 import { queueJob } from "./scheduler";
@@ -21,10 +21,10 @@ export function createRenderer(renderOptions: any) {
         patchProp: hostPatchProp,
     } = renderOptions
 
-    const mountChildren = (children: any, container: VueTMLElement, parentComponent: ComponentInstance | null) => {
+    const mountChildren = (children: any, container: VueTMLElement, anchor: HTMLElement | null = null, parentComponent: ComponentInstance | null) => {
         normalizeTextChildren(children)
         for (let i = 0; i < children.length; i++) {
-            patch(null, children[i], container, null, parentComponent) // 递归调用patch函数处理子节点
+            patch(null, children[i], container, anchor, parentComponent) // 递归调用patch函数处理子节点
         }
 
     }
@@ -45,7 +45,7 @@ export function createRenderer(renderOptions: any) {
         if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
             hostSetElementText(el, children) // 设置文本内容
         } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-            mountChildren(children, el, parentComponent) // 递归处理子节点   
+            mountChildren(children, el, anchor, parentComponent) // 递归处理子节点   
         }
 
         hostInsert(el, container, anchor) // 插入到容器中
@@ -55,7 +55,7 @@ export function createRenderer(renderOptions: any) {
         if (n1 === null) {
             mountElement(n2, container, anchor, parentComponent)
         } else {
-            patchElement(n1, n2, container, parentComponent)
+            patchElement(n1, n2, container, anchor, parentComponent)
         }
     }
 
@@ -182,14 +182,17 @@ export function createRenderer(renderOptions: any) {
     }
 
     const normalizeTextChildren = (children: any[]) => {
-        for (let i = 0; i < children.length; i++) {
-            if (typeof children[i] === 'string' || typeof children[i] === 'number') {
-                children[i] = createVnode(Text, null, children[i])
+        if (Array.isArray(children)) {
+            for (let i = 0; i < children.length; i++) {
+                if (typeof children[i] === 'string' || typeof children[i] === 'number') {
+                    children[i] = createVnode(Text, null, children[i])
+                }
             }
         }
+        return children
     }
 
-    const patchChildren = (n1: vnode, n2: vnode, el: VueTMLElement, parentComponent: ComponentInstance | null) => {
+    const patchChildren = (n1: vnode, n2: vnode, el: VueTMLElement, anchor: HTMLElement | null, parentComponent: ComponentInstance | null) => {
         // 孩子的三种情况 text array null
         normalizeTextChildren(n2.children as any[])
         const c1 = n1.children
@@ -228,9 +231,15 @@ export function createRenderer(renderOptions: any) {
                 }
 
                 if (nextShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-                    mountChildren(c2 as Array<vnode>, el, parentComponent) // 挂载新节点的子节点
+                    mountChildren(c2 as Array<vnode>, el, anchor, parentComponent) // 挂载新节点的子节点
                 }
             }
+        }
+    }
+
+    const patchBlockChildren = (n1: vnode, n2: vnode, el: VueTMLElement, anchor: HTMLElement | null, parentComponent: ComponentInstance | null) => {
+        for (let i = 0; i < n2.dynamicChildren.length; i++) {
+            patch(n1.dynamicChildren[i], n2.dynamicChildren[i], el, anchor, parentComponent)
         }
     }
 
@@ -241,12 +250,36 @@ export function createRenderer(renderOptions: any) {
      * @param n2 新节点
      * @param container 容器
      */
-    const patchElement = (n1: vnode, n2: vnode, container: VueTMLElement, parentComponent: ComponentInstance | null) => {
+    const patchElement = (n1: vnode, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null, parentComponent: ComponentInstance | null) => {
         let el = n2.el = n1.el // 复用旧节点的真实元素
         let oldProps = n1.props || {}
         let newProps = n2.props || {}
-        patchProps(oldProps, newProps, el as VueTMLElement) // 更新属性
-        patchChildren(n1, n2, el as VueTMLElement, parentComponent) // 更新子节点
+
+        const { patchFlag, dynamicChildren } = n2
+        if (patchFlag) {
+            if (patchFlag & PatchFlags.STYLE) {
+
+            }
+            if (patchFlag & PatchFlags.CLASS) {
+
+            }
+            if (patchFlag & PatchFlags.TEXT) {
+                if (n1.children !== n2.children) {
+                    return hostSetElementText(el, n2.children)
+                }
+            }
+        } else {
+            patchProps(oldProps, newProps, el as VueTMLElement) // 更新属性
+        }
+
+        if (dynamicChildren) {
+            //线性比对
+            patchBlockChildren(n1, n2, el as VueTMLElement, anchor, parentComponent)
+        } else {
+            //全量diff
+            patchChildren(n1, n2, el as VueTMLElement, anchor, parentComponent) // 更新子节点
+        }
+
     }
 
     const processText = (n1: vnode | null, n2: vnode, container: VueTMLElement) => {
@@ -262,11 +295,11 @@ export function createRenderer(renderOptions: any) {
     }
 
 
-    const processFragment = (n1: vnode | null, n2: vnode, container: VueTMLElement, parentComponent: ComponentInstance | null) => {
+    const processFragment = (n1: vnode | null, n2: vnode, container: VueTMLElement, anchor: HTMLElement | null, parentComponent: ComponentInstance | null) => {
         if (n1 === null) {
-            mountChildren(n2.children as Array<vnode>, container, parentComponent)
+            mountChildren(n2.children as Array<vnode>, container, anchor, parentComponent)
         } else {
-            patchChildren(n1, n2, container, parentComponent)
+            patchChildren(n1, n2, container, anchor, parentComponent)
         }
     }
 
@@ -435,7 +468,7 @@ export function createRenderer(renderOptions: any) {
                 processText(n1, n2, container)
                 break
             case Fragment:
-                processFragment(n1, n2, container, parentComponent)
+                processFragment(n1, n2, container, anchor, parentComponent)
                 break;
             default:
                 if (shapeFlag & ShapeFlags.ELEMENT) {

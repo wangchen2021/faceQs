@@ -15,3 +15,8 @@ Vite实现增量更新，仅重新编译改动模块并局部刷新页面。‌�
 - 配置上
 Webpack需编写webpack.config.js定义loader、plugin等，配置项多达数百个。‌‌
 Vite默认集成TypeScript、CSS预处理器等，80%常用功能无需额外配置。‌‌
+
+
+
+## vite新版 rollup
+rolldown-vite 是 Vite 官方正在验证的“Rust 版打包核心”技术预览包，把 Vite 生产环境原本的 Rollup + Babel/Terser 整条 JavaScript 工具链，一次性替换为 Rust 编写的 Rolldown + Oxc，从而在不改配置的情况下获得 3–16 倍构建提速和近 100 倍内存降幅

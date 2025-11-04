@@ -25,3 +25,25 @@ function jieliu(fn, interval = 3000) {
         }
     }
 }
+
+
+function myfangdou(fn, delay) {
+    let timer = null
+    return function (...args) {
+        if (timer) clearTimeout(timer)
+        timer = setTimeout(() => {
+            fn.apply(this, args)
+        }, delay)
+    }
+}
+
+function myJieLiu(fn, delay) {
+    let lastTime = 0
+    return function (...args) {
+        const now = Date.now()
+        if (now - currentTime > delay) {
+            fn.apply(this, args)
+            lastTime = now
+        }
+    }
+}

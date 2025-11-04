@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        var a = 1
+        let b = 2
+
+        // -------------------1. 全局污染 ----------------------------------------
+        console.log(window.a); //1
+        console.log(window.b);  //undefined
+
+        //--------------------2. 块级作用域----------------------------------------
+        for (var i = 0; i < 3; i++) {
+
+        }
+        console.log(i); //3
+
+        for (let j = 0; j < 3; j++) {
+
+        }
+        console.log(j); //undefined
+
+
+        //--------------------3. 暂时性死区----------------------------------------
+        // 其实都在执行上下文 可以说都是一种提升 只是被上了一把TDZ暂时性锁
+        console.log(e); // undefined
+        console.log(f); // Cannot access 'f' before initialization
+
+        var e = "e"
+        let f = "f"
+
+
+    </script>
+    <script>
+        console.log(b);  //2 可跨标签使用
+    </script>
+</body>
+
+</html>

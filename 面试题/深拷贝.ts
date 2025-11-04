@@ -42,3 +42,29 @@ let obj3 = deepClone(obj)
 
 obj.a = 6
 console.table([obj, obj2, obj3]);
+
+
+function myClone(target: any) {
+    const type = Object.prototype.toString.call(target)
+    let res: any
+    switch (type) {
+        case "[object Object]":
+            res = {}
+            break;
+        case "[object Array]":
+            res = []
+            break;
+        default:
+            return res
+    }
+    for (let key in target) {
+        const value = target[key]
+        const valueType = Object.prototype.toString.call(value)
+        if (valueType === "[object Object]" || valueType === "[object Array]") {
+            res[key] = myClone(value)
+        } else {
+            res[key] = value
+        }
+    }
+    return res
+}

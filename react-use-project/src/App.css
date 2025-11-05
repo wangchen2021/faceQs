@@ -1,0 +1,50 @@
+.demo-logo-vertical {
+height: 32px;
+margin: 16px;
+background: rgba(255, 255, 255, 0.3);
+border-radius: 6px;
+}
+
+/* 调整整体布局高度占满页面 */
+.ant-layout {
+min-height: 100vh;
+}
+
+/* 左侧菜单栏 */
+.ant-layout-sider {
+box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35);
+}
+
+/* 头部样式 */
+.ant-layout-header {
+display: flex;
+align-items: center;
+padding: 0 16px;
+background: #fff;
+box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+}
+
+/* 内容区样式 */
+.ant-layout-content {
+background: #fff;
+border-radius: 8px;
+box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 按钮样式微调 */
+.ant-btn-text {
+color: rgba(0, 0, 0, 0.65);
+}
+
+.ant-btn-text:hover {
+color: #1890ff;
+}
+
+.trigger{
+  margin-left: 35px;
+}
+
+.app-name{
+  color: white;
+  margin-left: 10%;
+}

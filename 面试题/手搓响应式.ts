@@ -6,7 +6,6 @@ const isReacive = Symbol("__v_isReactive")
 
 function reacive(target: any) {
     if (typeof target === "object" && !target[isReacive]) {
-        target[isReacive] = true
         return createReactiveObject(target)
     } else {
         return target
@@ -23,6 +22,9 @@ function reacive(target: any) {
 function createReactiveObject(target: object) {
     return new Proxy(target, {
         get(target: any, key, reaciver) {
+            if (key === isReacive) {
+                return true
+            }
             track(target, key)
             return Reflect.get(target, key, reaciver)
         },
@@ -125,7 +127,7 @@ const runner = effect(test,
         schedule: () => {
             console.log("自定义runner执行");
             runner()
-        }
+        },
     }
 )
 

@@ -25,3 +25,7 @@ history和hash 同vue
 
 5. ant desin react
 https://4x-ant-design.antgroup.com/docs/react/introduce-cn
+
+
+6. redux
+https://www.redux.org.cn/

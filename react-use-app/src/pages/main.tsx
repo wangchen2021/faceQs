@@ -1,26 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import MySider from '../components/Aside';
-import {
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
-} from '@ant-design/icons';
+import Header from "@/components/Header"
 import { Layout } from 'antd';
-import {Outlet} from "react-router-dom"
+import { Outlet } from "react-router-dom"
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 const Main: React.FC = () => {
-    const [collapsed, setCollapsed] = useState(false);
     return (
         <Layout className='main-container'>
-            <MySider></MySider>
+            <MySider />
             <Layout className="site-layout">
-                <Header className="site-layout-background" style={{ padding: 0 }}>
-                    {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                        className: 'trigger',
-                        onClick: () => setCollapsed(!collapsed),
-                    })}
-                </Header>
+                <Header />
                 <Content
                     className="site-layout-background"
                     style={{

@@ -1,4 +1,4 @@
-export const menuConfig = [
+export const MenuConfig = [
 
     {
 

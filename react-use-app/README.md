@@ -29,3 +29,10 @@ https://4x-ant-design.antgroup.com/docs/react/introduce-cn
 
 6. redux
 https://www.redux.org.cn/
+
+
+7. nestJs
+https://www.nestjs.com.cn/controllers
+
+8. axios
+https://axios-http.com/zh/docs/intro

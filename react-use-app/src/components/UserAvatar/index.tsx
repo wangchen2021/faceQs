@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactSvg from "@/assets/react.svg"
 import { Avatar, Dropdown, type MenuProps } from 'antd'
+import { postAction } from "@/request"
 
 interface UserAvatarProps {
     showMenu?: true | false
@@ -9,9 +10,23 @@ interface UserAvatarProps {
 }
 
 const index: React.FC<UserAvatarProps> = ({ showMenu, width = "15px", height = "15px" }) => {
+
     const logout = () => {
-        alert("注销成功")
+        // fechRequest({
+        //     url: "http://localhost:3000/testPost",
+        //     method: "POST",
+        //     data: { test: "testdata" },
+        //     headers: { 'Content-Type': 'application/json' }
+        // })
+        //     .then((res) => {
+        //         console.log(res);
+        //     })
+        postAction({
+            url: "/testPost",
+            data: { test: "testdata" },
+        })
     }
+
     const items: MenuProps['items'] = [
         {
             key: '1',
@@ -26,6 +41,7 @@ const index: React.FC<UserAvatarProps> = ({ showMenu, width = "15px", height = "
             ),
         },
     ]
+
     return showMenu ? (
         <Dropdown placement='bottom' menu={{ items }}>
             <Avatar className='avatar' src={<img className='avatar-img' src={ReactSvg}></img>}></Avatar>

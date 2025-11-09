@@ -18,7 +18,7 @@ const Main: React.FC = () => {
                         margin: '24px 16px',
                         padding: 24,
                         minHeight: 280,
-                        backgroundColor:"rgba(252, 252, 252, 1)"
+                        backgroundColor: "rgba(252, 252, 252, 1)"
                     }}
                 >
                     <Outlet></Outlet>

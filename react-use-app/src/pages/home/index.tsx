@@ -2,18 +2,20 @@ import React from 'react'
 import { Col, Row, Card, Form, Divider } from "antd"
 import './index.less'
 import UserAvatar from "@/components/UserAvatar"
+import { useCount } from "@/hooks"
 
 const home: React.FC = () => {
+  const { count, increment } = useCount();
   return (
     <Row className='home'>
       <Col span={8}>
-        <Card hoverable>
+        <Card onClick={increment} hoverable>
           <div className='user-info'>
             <div className='user-info-l1'>
               <UserAvatar width='150px' height='150px'></UserAvatar>
               <div className='user-info-l1-words'>
                 <div style={{ fontSize: "30px", fontWeight: "bold" }}>王晨</div>
-                <div style={{ fontSize: "15px", marginTop: "15px" }}>超级管理员</div>
+                <div style={{ fontSize: "15px", marginTop: "15px" }}>超级管理员{count}</div>
               </div>
             </div>
             <Divider></Divider>

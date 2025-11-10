@@ -5,6 +5,7 @@ import Mall from "../pages/mall"
 import User from "../pages/user"
 import pageOne from "../pages/other/pageOne"
 import pageTwo from "../pages/other/pageTwo"
+import login from "@/pages/login"
 
 const routes: RouteObject[] = [
     {
@@ -24,6 +25,21 @@ const routes: RouteObject[] = [
                 ]
             }
         ]
+    },
+    // {
+    //     path: "/login",
+    //     lazy: async () => {
+    //         const module = await import("../pages/login")
+    //         return { Component: module.default }
+    //     }
+    // }
+    // {
+    //     path: "/login",
+    //     Component: React.lazy(() => import("../pages/login"))
+    // }
+    {
+        path: "/login",
+        Component: login
     }
 ];
 

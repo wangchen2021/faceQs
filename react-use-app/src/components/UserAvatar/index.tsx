@@ -2,6 +2,7 @@ import React from 'react'
 import ReactSvg from "@/assets/react.svg"
 import { Avatar, Dropdown, type MenuProps } from 'antd'
 import { postAction } from "@/request"
+import { useNavigate } from "react-router-dom"
 
 interface UserAvatarProps {
     showMenu?: true | false
@@ -10,7 +11,7 @@ interface UserAvatarProps {
 }
 
 const index: React.FC<UserAvatarProps> = ({ showMenu, width = "15px", height = "15px" }) => {
-
+    const navigate = useNavigate();
     const logout = () => {
         // fechRequest({
         //     url: "http://localhost:3000/testPost",
@@ -24,6 +25,9 @@ const index: React.FC<UserAvatarProps> = ({ showMenu, width = "15px", height = "
         postAction({
             url: "/testPost",
             data: { test: "testdata" },
+        }).then((res) => {
+            console.log(res.data);
+            navigate("/login");
         })
     }
 

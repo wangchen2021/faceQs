@@ -5,11 +5,13 @@ import { MenuConfig } from "@/config"
 import type { ItemType } from 'antd/es/menu/interface';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
+import { useCount } from "@/hooks"
 
 const { Sider } = Layout;
 
 const ASide: React.FC = () => {
     const collapsed = useSelector((state: RootState) => state.tabSlice.collapsed)
+    const { count, decrement } = useCount();
 
     //动态获取ICON
     const iconToElement = (name: string) => {
@@ -36,7 +38,7 @@ const ASide: React.FC = () => {
 
     return (
         <Sider trigger={null} collapsible collapsed={collapsed}>
-            <h3 className='app-name'>晨测试</h3>
+            <h3 onClick={decrement} className='app-name'>晨测试{count}</h3>
             <Menu
                 theme="dark"
                 mode="inline"

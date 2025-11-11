@@ -19,29 +19,37 @@
 @media (min-width:1000px) {
   .btn {
     position: fixed;
-    width: 200px;
-    height: 60px;
-    left: 30px;
+    left: 50px;
     top: 100px;
     color: white;
     background-color: rgb(116, 210, 253);
     border: none;
-    border-radius: 32px;
+    border-radius: 50%;
     cursor: pointer;
+    box-sizing: border-box;
+    padding: 20px;
+  }
+
+  .refresh-icon {
+    width: 50px;
   }
 }
 
 @media (max-width:1000px) {
   .btn {
     position: fixed;
-    width: 600px;
-    height: 200px;
     left: 100px;
-    top: 150px;
+    top: 100px;
     color: white;
     background-color: rgb(116, 210, 253);
     border: none;
-    border-radius: 100px;
+    border-radius: 50%;
     cursor: pointer;
+    box-sizing: border-box;
+    padding: 40px;
+  }
+
+  .refresh-icon {
+    width: 200px;
   }
 }

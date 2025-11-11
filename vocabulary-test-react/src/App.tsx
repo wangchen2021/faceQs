@@ -3,6 +3,7 @@ import "./App.css"
 import Card from "./components/Card"
 import { addWordsToVocabulary, interstellarWords, Vocabulary, type VocabularyDecration, animalWords } from './vocabulary'
 import * as motion from "motion/react-client"
+import refreshSvg from "@/assets/refresh.svg"
 
 const cardColors = [
   "linear-gradient(306deg, hsl(20, 100%, 50%), hsl(40, 100%, 50%))",
@@ -39,7 +40,9 @@ const App: React.FC = () => {
 
   return (
     <div className="container">
-      <motion.button whileTap={{ scale: 1.3, backgroundColor: "rgba(95, 189, 233, 1)" }} whileHover={{ scale: 1.2 }} className="btn" onClick={getRandomWord}>随机抽取单词</motion.button>
+      <motion.button whileTap={{ scale: 1.3, backgroundColor: "rgba(95, 189, 233, 1)" }} whileHover={{ scale: 1.2 }} className="btn" onClick={getRandomWord}>
+          <img className="refresh-icon" src={refreshSvg}></img>
+      </motion.button>
       <div className="center">
         {currentWords.map((item, i) => (
           <Card i={i} word={item} color={getColor(i)} key={item.word} />

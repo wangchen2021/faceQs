@@ -1,4 +1,4 @@
-type WordsType = "n." | "v." | "adj." | "adv." | "pron." | "conj." | "prep." | "interj.";
+export type WordsType = "n." | "v." | "adj." | "adv." | "pron." | "conj." | "prep." | "interj.";
 
 /**
  * @param word 单词
@@ -6,38 +6,25 @@ type WordsType = "n." | "v." | "adj." | "adv." | "pron." | "conj." | "prep." | "
  * @param translation 翻译
  * @param exampleSentence 例句
  */
-interface VocabularyDecration {
+export interface VocabularyDecration {
     word: string;
     type: WordsType | WordsType[];
     translation: string | string[];
     exampleSentence?: string;
+    rememberDate?: Date;
+    failTimes?: number;
+    SuccessTimes?: number;
+    accuracy?: string;
 }
 
-/**
- * 
- * @param word
- * @param type
- * @param translation 
- * @param exampleSentence 
- * @returns 
- */
-function createVocabularyDeclaration(word: string, type: WordsType, translation: string | string[], exampleSentence?: string): VocabularyDecration {
-    return {
-        word,
-        type,
-        translation,
-        exampleSentence
-    };
-}
-
-function addWordsToVocabulary(vocabulary: Vocabulary, wordsDecalarations: VocabularyDecration[]) {
+export function addWordsToVocabulary(vocabulary: Vocabulary, wordsDecalarations: VocabularyDecration[]) {
     wordsDecalarations.forEach(declaration => vocabulary.addWord(declaration));
 }
 
 /**
  * @description 词汇类
  */
-class Vocabulary {
+export class Vocabulary {
     words = new Map<string, VocabularyDecration>();
     constructor() { }
 
@@ -78,40 +65,41 @@ class Vocabulary {
         }
         return res;
     }
-    
+
     static giveMeFire() {
         return console.log("加油🔥");
     }
 }
 
-const vocabulary = new Vocabulary();
+// const vocabulary = new Vocabulary();
 
-const wordsParams: VocabularyDecration[] = [
-    {
-        word: "nocturnal",
-        type: "adj.",
-        translation: "夜间的，夜间活动的",
-        exampleSentence: "Owls are nocturnal creatures."
-    },
-    {
-        word: "anatomy",
-        type: "n.",
-        translation: "解剖学，人体结构",
-        exampleSentence: "He studied human anatomy in medical school."
-    },
-    {
-        word: "acoustic",
-        type: ["adj.", "n."],
-        translation: ["声音的，听觉的", "声学", "音质"],
-        exampleSentence: "The concert hall has excellent acoustic properties."
-    },
-]
+// const wordsParams: VocabularyDecration[] = [
+//     {
+//         word: "nocturnal",
+//         type: "adj.",
+//         translation: "夜间的，夜间活动的",
+//         exampleSentence: "Owls are nocturnal creatures."
+//     },
+//     {
+//         word: "anatomy",
+//         type: "n.",
+//         translation: "解剖学，人体结构",
+//         exampleSentence: "He studied human anatomy in medical school."
+//     },
+//     {
+//         word: "acoustic",
+//         type: ["adj.", "n."],
+//         translation: ["声音的，听觉的", "声学", "音质"],
+//         exampleSentence: "The concert hall has excellent acoustic properties."
+//     },
+//     ...interstellarWords
+// ]
 
-addWordsToVocabulary(vocabulary, wordsParams);
+// addWordsToVocabulary(vocabulary, wordsParams);
 
-console.log(vocabulary.randomWord());
+// console.log(vocabulary.randomWord());
 
-Vocabulary.giveMeFire();
+// Vocabulary.giveMeFire();
 
 
 

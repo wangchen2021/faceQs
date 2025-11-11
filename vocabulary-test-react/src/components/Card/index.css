@@ -1,0 +1,132 @@
+/* 卡片容器样式 */
+.card-container {
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding-top: 20px;
+    margin-bottom: 100px;
+}
+
+.content {
+    position: relative;
+    overflow: visible;
+}
+
+@media (min-width:1000px) {
+
+    /* 卡片样式 */
+    .card {
+        font-size: 134px;
+        width: 300px;
+        height: 430px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 20px;
+        background: #f5f5f5;
+        box-shadow:
+            0 0 1px hsl(0deg 0% 0% / 0.075),
+            0 0 2px hsl(0deg 0% 0% / 0.075),
+            0 0 4px hsl(0deg 0% 0% / 0.075),
+            0 0 8px hsl(0deg 0% 0% / 0.075),
+            0 0 16px hsl(0deg 0% 0% / 0.075);
+        transform-origin: 10% 60%;
+        box-sizing: border-box;
+        padding-top: 30px;
+    }
+
+    /*  splash 装饰样式 */
+    .splash {
+        position: absolute;
+        width: 500px;
+        height: 200px;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%) rotateZ(1deg);
+        border-radius: 20px;
+    }
+
+    .speak-icon {
+        font-size: 80px;
+        cursor: pointer;
+    }
+
+    .card-word-container {
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        overflow: visible;
+        justify-content: center;
+    }
+
+    .card-footer {
+        box-sizing: border-box;
+        font-size: 30px;
+        line-height: 60px;
+        padding-left: 40px;
+    }
+
+    .un-select {
+        user-select: none;
+    }
+
+}
+
+@media (max-width:1000px) {
+
+    /* 卡片样式 */
+    .card {
+        font-size: 254px;
+        width: 800px;
+        height: 1300px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50px;
+        background: #f5f5f5;
+        box-shadow:
+            0 0 1px hsl(0deg 0% 0% / 0.075),
+            0 0 2px hsl(0deg 0% 0% / 0.075),
+            0 0 4px hsl(0deg 0% 0% / 0.075),
+            0 0 8px hsl(0deg 0% 0% / 0.075),
+            0 0 16px hsl(0deg 0% 0% / 0.075);
+        transform-origin: 10% 60%;
+        box-sizing: border-box;
+        padding-top: 120px;
+    }
+
+    /*  splash 装饰样式 */
+    .splash {
+        position: absolute;
+        width: 1500px;
+        height: 500px;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%) rotateZ(1deg);
+        border-radius: 50px;
+    }
+
+    .speak-icon {
+        font-size: 200px;
+        cursor: pointer;
+    }
+
+    .card-word-container {
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        overflow: visible;
+        justify-content: center;
+    }
+
+    .card-footer {
+        box-sizing: border-box;
+        font-size: 100px;
+        line-height: 180px;
+        padding-left: 50px;
+    }
+
+    .un-select {
+        user-select: none;
+    }
+}

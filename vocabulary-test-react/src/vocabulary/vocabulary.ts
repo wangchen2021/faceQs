@@ -66,6 +66,10 @@ export class Vocabulary {
         return res;
     }
 
+    clearAll() {
+        this.words.clear()
+    }
+
     static giveMeFire() {
         return console.log("加油🔥");
     }

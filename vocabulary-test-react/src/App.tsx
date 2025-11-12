@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import "./App.css"
 import Card from "./components/Card"
-import { addWordsToVocabulary, interstellarWords, Vocabulary, type VocabularyDecration, animalWords } from './vocabulary'
+import { addWordsToVocabulary, interstellarWords, Vocabulary, type VocabularyDecration, animalWords, educationalWords } from './vocabulary'
 import * as motion from "motion/react-client"
 import refreshSvg from "@/assets/refresh.svg"
 
@@ -25,7 +25,8 @@ const App: React.FC = () => {
   const [currentWords, setCurrentWords] = useState<VocabularyDecration[]>([])
   const vocabularyDeclarations: VocabularyDecration[] = [
     ...animalWords,
-    ...interstellarWords
+    ...interstellarWords,
+    ...educationalWords,
   ]
 
   useEffect(() => {
@@ -41,11 +42,11 @@ const App: React.FC = () => {
   return (
     <div className="container">
       <motion.button whileTap={{ scale: 1.3, backgroundColor: "rgba(95, 189, 233, 1)" }} whileHover={{ scale: 1.2 }} className="btn" onClick={getRandomWord}>
-          <img className="refresh-icon" src={refreshSvg}></img>
+        <img className="refresh-icon" src={refreshSvg}></img>
       </motion.button>
       <div className="center">
         {currentWords.map((item, i) => (
-          <Card i={i} word={item} color={getColor(i)} key={item.word} />
+          <Card getRandomWord={getRandomWord} i={i} word={item} color={getColor(i)} key={item.word} />
         ))}
       </div>
     </div>

@@ -1,0 +1,28 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    // 基础设置
+    "target": "ESNext", // 编译目标 ES 版本（根据项目需求调整）
+    "module": "esnext", // 模块系统（ES 模块，支持 tree-shaking）
+    // "moduleResolution": "", // 模块解析策略（兼容 Node.js 和 ES 模块）
+    "esModuleInterop": true, // 允许 CommonJS 和 ES 模块互操作
+    "forceConsistentCasingInFileNames": true, // 强制文件名大小写一致（避免跨系统问题）
+    "strict": true, // 开启严格模式（强烈推荐）
+    "skipLibCheck": true, // 跳过库类型检查（加速编译）
+    // "resolveJsonModule": true, // 允许导入 JSON 文件
+    "sourceMap": true, // 生成 sourceMap（调试用）
+    "declaration": true, // 生成 .d.ts 类型文件（共享包必备）
+    "declarationMap": true, // 为 .d.ts 生成 sourceMap
+    // 路径别名（Monorepo 核心：简化子包间引用）
+    "baseUrl": ".",
+    "paths": {
+      "@chen/backend/*": ["apps/backend/src/*"], // 引用 backend 包的源码
+      "@chen/frontend/*": ["apps/frontend/src/*"], // 引用 frontend 包的源码
+      "@chen/utils/*": ["packages/utils/src/*"] // 引用 utils 包的源码
+    },
+    // // 类型定义（根据项目添加，如 React、Node 等）
+    "types": ["node"]
+  },
+  // 排除不需要编译的文件
+  "exclude": ["node_modules", "**/dist", "**/build"]
+}

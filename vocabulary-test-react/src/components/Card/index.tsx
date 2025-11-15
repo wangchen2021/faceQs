@@ -2,7 +2,8 @@ import type React from "react"
 import * as motion from "motion/react-client"
 import "./index.css"
 import type { VocabularyDecration } from "@/vocabulary"
-import { useRef } from "react"
+import { useContext, useRef } from "react"
+import ThemeContext from "@/contexts/ThemeContext"
 
 interface CardProps {
     word: VocabularyDecration
@@ -17,6 +18,7 @@ const Card: React.FC<CardProps> = ({ word, color, i, getRandomWord }: CardProps)
 
     const boxRef = useRef<HTMLDivElement>(null)
     const cardRef = useRef<HTMLDivElement>(null)
+    const { theme, change } = useContext(ThemeContext)
 
     const speakWord = (word: string) => {
         const utterance = new SpeechSynthesisUtterance(word)
@@ -35,7 +37,7 @@ const Card: React.FC<CardProps> = ({ word, color, i, getRandomWord }: CardProps)
     }
 
     return (
-        <>
+        <><div onClick={change}>{theme}</div>
             <motion.div
                 className={`card-container-${i} card-container un-select`}
                 initial="offscreen"

@@ -8,6 +8,8 @@ https://www.bilibili.com/video/BV198mKYYEKN/?spm_id_from=333.337.search-card.all
 
 https://www.bilibili.com/video/BV1NvCzYvEBT/?spm_id_from=333.337.search-card.all.click&vd_source=2e335378575371c0ee42c4dc7ddc2978
 
+`curent:` https://www.bilibili.com/video/BV1NvCzYvEBT?spm_id_from=333.788.videopod.episodes&vd_source=2e335378575371c0ee42c4dc7ddc2978&p=16
+
 ***
 
 ## react迭代变化
@@ -117,3 +119,87 @@ state状态 页面发出action 通知reducer修改state
 5. `SomeContent.Provider`||`SomeContent.Consumer`
 6. `forwordRef`||`momo`||`lazy`||`createPortal`=`vue:<teleport>`
 
+
+## context
+
+1. 创建context
+```javascript
+// src/contexts/ThemeContext.js
+import { createContext } from 'react';
+
+// 创建主题上下文，默认值为 { theme: 'light', toggle: () => {} }
+const ThemeContext = createContext({
+  theme: 'light',
+  toggle: () => {},
+});
+
+export default ThemeContext;
+```
+
+2. 传递
+```javascript
+// src/App.js
+import { useState } from 'react';
+import ThemeContext from './contexts/ThemeContext';
+import Child from './Child';
+
+function App() {
+  // 定义需要共享的状态和方法
+  const [theme, setTheme] = useState('light');
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
+  return (
+    {/* 提供 Context：向子组件传递 theme 和 toggleTheme */}
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      <div className={`app ${theme}`}>
+        <h1>当前主题：{theme}</h1>
+        <Child /> {/* 子组件（可多层嵌套） */}
+      </div>
+    </ThemeContext.Provider>
+  );
+}
+
+export default App;
+```
+
+3. 使用
+- useContext `const { theme } = useContext(ThemeContext);`
+- `Context.Consumer` : 
+```javascript
+  <ThemeContext.Consumer>
+        {/* 回调函数接收 value 并返回 JSX */}
+        {({ theme, toggleTheme }) => (
+          <div>
+            <p>类组件主题：{theme}</p>
+            <button onClick={toggleTheme}>切换</button>
+          </div>
+        )}
+      </ThemeContext.Consumer>
+```
+
+- `类组件中使用 contextType`
+
+
+## 脚手架
+1. create-react-app
+2. next.js 全栈框架
+3. umi
+4. vite
+5. antd pro
+6. Umi
+7. Dva
+
+## 性能优化
+
+1. 复用组件
+patchChild 深度优先 同层对比 注意key值使用
+
+2. 避免不必要更新
+- `memo`组件 两个参数 组件 和 对比函数（prev，next）
+- `shouldComponentUpdate` 类组件专用
+- `pureComponent` 类组件专用
+
+3. 缓存策略 减少运算
+- `useMomo`

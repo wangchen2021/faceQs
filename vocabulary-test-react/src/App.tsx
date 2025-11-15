@@ -4,6 +4,7 @@ import Card from "./components/Card"
 import { addWordsToVocabulary, interstellarWords, Vocabulary, type VocabularyDecration, animalWords, educationalWords } from './vocabulary'
 import * as motion from "motion/react-client"
 import refreshSvg from "@/assets/refresh.svg"
+import ThemeContext from "./contexts/ThemeContext"
 
 const cardColors = [
   "linear-gradient(306deg, hsl(20, 100%, 50%), hsl(40, 100%, 50%))",
@@ -23,11 +24,16 @@ const vocabulary = new Vocabulary()
 
 const App: React.FC = () => {
   const [currentWords, setCurrentWords] = useState<VocabularyDecration[]>([])
+  const [theme, setTheme] = useState<"dark" | "light">("light")
   const vocabularyDeclarations: VocabularyDecration[] = [
     ...animalWords,
     ...interstellarWords,
     ...educationalWords,
   ]
+
+  const changeTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light")
+  }
 
   useEffect(() => {
     addWordsToVocabulary(vocabulary, vocabularyDeclarations)
@@ -44,11 +50,13 @@ const App: React.FC = () => {
       <motion.button whileTap={{ scale: 1.3, backgroundColor: "rgba(95, 189, 233, 1)" }} whileHover={{ scale: 1.2 }} className="btn" onClick={getRandomWord}>
         <img className="refresh-icon" src={refreshSvg}></img>
       </motion.button>
-      <div className="center">
-        {currentWords.map((item, i) => (
-          <Card getRandomWord={getRandomWord} i={i} word={item} color={getColor(i)} key={item.word} />
-        ))}
-      </div>
+      <ThemeContext.Provider value={{ theme, change: changeTheme }}>
+        <div className="center">
+          {currentWords.map((item, i) => (
+            <Card getRandomWord={getRandomWord} i={i} word={item} color={getColor(i)} key={item.word} />
+          ))}
+        </div>
+      </ThemeContext.Provider>
     </div>
   )
 }

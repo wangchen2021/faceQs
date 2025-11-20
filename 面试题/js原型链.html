@@ -22,21 +22,19 @@
 
         // js中所有的函数都有一个prototype的属性，该属性引用了一个对象，该对象叫做原型对象
         // js中每个对象都有一个__proto__属性，该属性指向它构造函数的prototype
-        class Test {
-            constructor() {
-                name: "test"
-            }
-        }
-        const a = function () {
-            console.log("fun");
-        }
-        const t = new Test()
-        console.log(a.prototype);
-        console.log("11".__proto__);
-        console.log(Object.prototype);
-        console.log(t.__proto__, Test.prototype, "class");
-        console.log(Object.prototype.__proto__);
-        console.log(Test.__proto__); 
+        // class Test {
+        //     constructor() {
+        //         name: "test"
+        //     }
+        // }
+        // const a = function () {
+        //     console.log("fun");
+        // }
+        // const t = new Test()
+        // console.log(Test.prototype.__proto__ === Object.prototype);
+        (function fn(){
+            console.log(2);
+        })()
     </script>
 </body>
 

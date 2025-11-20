@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button onclick="sayHello('chen')">test</button>
+    <script>
+
+        function fangDou(fn, delay = 1000) {
+            let timer = null
+            return () => {
+                if (timer) clearTimeout(timer)
+                timer = setTimeout((...args) => {
+                    fn.call(this, ...args)
+                }, delay)
+            }
+        }
+
+        function jieLiu(fn, delay = 1000) {
+            let lastTime = 0
+            return (...args) => {
+                const now = Date.now()
+                if (now - lastTime > delay) {
+                    fn.call(this, ...args)
+                    lastTime = now
+                }
+            }
+        }
+
+        const sayHello = jieLiu(() => {
+            console.log(111);
+        }, 2000)
+    </script>
+</body>
+
+</html>

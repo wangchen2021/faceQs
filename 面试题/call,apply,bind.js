@@ -57,3 +57,5 @@ obj.fun.myCall(obj2, "1", "2")
 obj.fun.myApply(obj2, ["5", "5"])
 let a = obj.fun.myBind(obj2, "6")
 a("7", "8")
+
+console.log(obj2);

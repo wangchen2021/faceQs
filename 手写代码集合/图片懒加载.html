@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .lazy{
+            width: 1000px;
+            height: 1000px;
+        }
+    </style>
+</head>
+
+<body>
+    <img class="lazy" data-src="./1.jpg" />
+    <img class="lazy" data-src="./1.jpg" />
+    <img class="lazy" data-src="./1.jpg" />
+    <img class="lazy" data-src="./1.jpg" />
+    <img class="lazy" data-src="./1.jpg" />
+    <img class="lazy" data-src="./1.jpg" />
+    <img class="lazy" data-src="./1.jpg" />
+</body>
+
+<script>
+    const imgs = document.getElementsByClassName("lazy")
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                const img = entry.target
+                img.src = img.dataset.src
+                img.removeAttribute("data-src")
+                observer.unobserve(img)
+            }
+        })
+    })
+    for (let img of imgs) {
+        observer.observe(img)
+    }
+</script>
+
+</html>

@@ -1,3 +1,4 @@
+export{}
 function request(url: string, method: string, data: any) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest()

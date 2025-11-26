@@ -22,7 +22,7 @@ function setUpPrams(params: RequestParams) {
     }
 }
 
-export function fechRequest(param: RequestParams) {
+export function fetchRequest(param: RequestParams) {
     setUpPrams(param)
     return new Promise((resolve, reject) => {
         fetch(param.url, {
@@ -40,9 +40,8 @@ export function fechRequest(param: RequestParams) {
                 reject(error)
             })
     })
-
 }
 
-fechRequest.get = function (param: RequestParams) {
-    return fechRequest({ ...param, method: 'GET' })
+fetchRequest.get = function (param: RequestParams) {
+    return fetchRequest({ ...param, method: 'GET' })
 }

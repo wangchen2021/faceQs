@@ -55,7 +55,6 @@ const SingleInstance = <T extends abstract new (...args: any[]) => any>(classNam
         construct(target:any, args, newTarget) {
             if (!target.instance) {
                 target.instance = Reflect.construct(target, args, newTarget)
-
             }
             return target.instance
         },

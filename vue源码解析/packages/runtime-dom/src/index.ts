@@ -6,7 +6,7 @@ import { createRenderer } from "@vue/runtime-core"
 const renderOptions = Object.assign({ patchProp }, nodeOps)
 
 export const render = (vnode: vnode, container: VueTMLElement) => {
-    return createRenderer(renderOptions).render(vnode, container)
+    return createRenderer(renderOptions).render(vnode, container,null)
 }
 
 export * from "@vue/runtime-core"

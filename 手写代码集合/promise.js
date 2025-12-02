@@ -183,6 +183,7 @@ class MyPromise {
 
     static race(arr) {
         return new MyPromise((resolve, reject) => {
+
             if (!Array.isArray(arr)) {
                 return reject(new TypeError("需要数组类型参数"))
             }
@@ -193,6 +194,7 @@ class MyPromise {
             arr.forEach((p) => {
                 MyPromise.resolve(p).then(resolve, reject)
             })
+            
         })
     }
 

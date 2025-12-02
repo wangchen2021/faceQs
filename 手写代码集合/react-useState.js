@@ -25,9 +25,6 @@
 // }
 
 
-
-
-
 let index = 0
 let state = []
 
@@ -52,7 +49,6 @@ function render() {
     console.log("重新渲染组件");
     index = 0
 }
-
 
 
 // let index = 0

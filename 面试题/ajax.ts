@@ -29,7 +29,7 @@ function setUpPrams(params: RequestParams) {
     }
 }
 
-function setHeadrs(xhr: XMLHttpRequest, headers: { [key: string]: string }) {
+function setHeaders(xhr: XMLHttpRequest, headers: { [key: string]: string }) {
     for (let key in headers) {
         xhr.setRequestHeader(key, headers[key])
     }
@@ -41,7 +41,7 @@ function request(params: RequestParams) {
     let { url, method, data, headers } = params as setUpPramsReturn
     xhr.open(url, method, true) //true表示异步请求
     if (headers) {
-        setHeadrs(xhr, headers)
+        setHeaders(xhr, headers)
     }
     xhr.send(data)
     return new Promise((resolve, reject) => {

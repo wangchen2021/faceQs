@@ -1,49 +1,15 @@
-function arrange(name) {
-    let tasks = [() => console.log(`${name} is notified`)]
-
-    const waitFunction = (time) => {
-        return new Promise((resolve, _reject) => {
-            setTimeout(() => {
-                resolve()
-            }, time);
-        })
+function halfSearch(arr, target, start) {
+    const len = arr.length
+    if (len === 0) return -1
+    const mid = len >> 1
+    const midValue = arr[mid]
+    if (target < midValue) {
+        return halfSearch(arr.slice(0, mid), target, start)
+    } else if (target > midValue) {
+        return halfSearch(arr.slice(mid + 1), target, start + mid + 1)
+    } else {
+        return mid + start
     }
-
-    const prop = {
-        wait: (time) => {
-            tasks.push(() => waitFunction(time * 1000))
-            return prop
-        },
-        do: (fn) => {
-            tasks.push(fn)
-            return prop
-        },
-        waitFirst: (time) => {
-            tasks.unshift(() => waitFunction(time * 1000))
-            return prop
-        },
-        execute: async () => {
-            for (let item of tasks) {
-                await item()
-                tasks.pop()
-            }
-        }
-    }
-    return prop
 }
 
-arrange("William")
-    .wait(5)
-    .do(() => {
-        console.log("commit");
-    })
-    .wait(2)
-    .do(() => {
-        console.log("我又等2s");
-    })
-    .waitFirst(3)
-    .execute()
-// wait 3s
-// William
-// wait 5s
-// commit
+console.log(halfSearch([1, 2, 4, 5, 7, 9], 9, 0));

@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json", // 继承根配置
+  "compilerOptions": {
+    // 子包自定义配置（覆盖根配置）
+    "outDir": "./dist", // 编译输出目录
+    "rootDir": "./", // 源码根目录
+    "noEmit": false // 允许编译（根配置可设 noEmit: true）
+  },
+  "include": [
+    "./src/**/*",
+    "./__test__/*"
+  ],
+  "exclude": [
+    "./dist"
+  ]
+}

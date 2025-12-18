@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    // 基础配置
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler", // 适配 ESModule 和 CommonJS
+    "esModuleInterop": true,
+    "strict": true, // 开启严格模式
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true, // 生成类型声明文件（子包发布用）
+    "declarationMap": true,
+    "sourceMap": true,
+
+    // Monorepo 核心：路径别名（跨包引用）
+    "baseUrl": ".",
+    "paths": {
+      // 别名映射：指向对应子包的 src 目录
+      "@my-mini-react/shared": ["packages/shared/src"],
+    }
+  },
+  "include": [
+    "packages/**/*", // 扫描所有子包
+    "scripts/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "packages/**/dist", // 排除编译产物
+    "packages/**/__test__/coverage" // 排除测试覆盖率报告
+  ]
+}

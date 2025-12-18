@@ -17,3 +17,7 @@ export function isObject(target: any) {
 export function isFun(target: any) {
     return typeof target === "function"
 }
+
+export function isStr(target: any) {
+    return typeof target === "string"
+}

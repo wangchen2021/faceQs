@@ -11,12 +11,15 @@
     "declaration": true, // 生成类型声明文件（子包发布用）
     "declarationMap": true,
     "sourceMap": true,
-
     // Monorepo 核心：路径别名（跨包引用）
     "baseUrl": ".",
     "paths": {
-      // 别名映射：指向对应子包的 src 目录
-      "@my-mini-react/shared": ["packages/shared/src"],
+      "@my-mini-react/shared": [
+        "packages/shared/src"
+      ],
+      "@my-mini-react/shared/*": [
+        "packages/shared/src/*"
+      ],
     }
   },
   "include": [

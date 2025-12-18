@@ -8,6 +8,9 @@
   "scripts": {
     "test": "vitest"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",

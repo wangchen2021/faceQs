@@ -1,5 +1,5 @@
 import { NoPriority, PriorityLevel } from "./SchedulerPriorities"
-import { getCurrentTime } from "@my-mini-react/shared/utils"
+import { getCurrentTime } from "@my-mini-react/shared"
 
 export * from "./SchedulerPriorities.js"
 

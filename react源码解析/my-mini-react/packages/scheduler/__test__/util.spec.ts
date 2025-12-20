@@ -8,7 +8,7 @@ function createNode(val: number): Node {
     return { id: idCounter++, sortIndex: val }
 }
 
-describe("scheduler", () => {
+describe("util", () => {
     test("isArray", () => {
         expect(isArray([1, 2, 3])).toBe(true)
         expect(isArray({ a: 1 })).toBe(false)

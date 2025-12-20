@@ -13,8 +13,10 @@ export function peek<T extends Node>(heap: Heap<T>): T | null {
 export function push<T extends Node>(heap: Heap<T>, node: T): void {
     const index = heap.length
     heap.push(node)
-    //调整 从下往上冒泡
-    siftUp(heap, node, index)
+    if (heap.length > 1) {
+        //调整 从下往上冒泡
+        siftUp(heap, node, index)
+    }
 }
 
 // 删除元素
@@ -64,7 +66,7 @@ function siftDown<T extends Node>(heap: Heap<T>, node: T, i: number): void {
                 heap[leftIndex] = node
                 index = leftIndex
             }
-        } else if (compare(right, node) < 0) {
+        } else if (right && compare(right, node) < 0) {
             heap[index] = right
             heap[rightIndex] = node
             index = rightIndex

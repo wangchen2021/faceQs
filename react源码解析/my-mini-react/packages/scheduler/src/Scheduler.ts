@@ -1,6 +1,6 @@
 import { lowPriorityTimeout, maxSigned31bitInt, normalPriorityTimeout, userBlockingPriorityTimeout } from "./SchedulerFeatureFlags"
 import { peek, pop, push } from "./SchedulerMinHeap"
-import { IdlePriority, ImmediatePriority, LowPriority, NoPriority, NormalPriority, PriorityLevel, UserBlockingPriority } from "./SchedulerPriorities"
+import { IdlePriority, ImmediatePriority, LowPriority, NormalPriority, PriorityLevel, UserBlockingPriority } from "./SchedulerPriorities"
 import { getCurrentTime } from "@my-mini-react/shared"
 
 export * from "./SchedulerPriorities.js"
@@ -22,7 +22,7 @@ const taskQueue: Array<Task> = []
 const timerQueue: Array<Task> = []
 
 let currentTask: Task | null = null
-let currentPriorityLevel: PriorityLevel = NoPriority
+let currentPriorityLevel: PriorityLevel = NormalPriority
 let startTime = -1
 
 let frameInterval = 5
@@ -95,10 +95,11 @@ export function scheduleCallback(priorityLevel: PriorityLevel, callback: Callbac
         if (peek(taskQueue) === null && newTask === peek(timerQueue)) {
             if (isHostTimeoutScheduled) {
                 //newTask才是堆顶任务
-
+                cancelHostTimeout()
             } else {
-
+                isHostTimeoutScheduled = true
             }
+            requestHostTimeout(handleTimeout, startTime - currentTime)
         }
     } else {
         newTask.sortIndex = expirationTime
@@ -176,7 +177,7 @@ export function cancelCallback(callback: Callback) {
         currentTask.callback = null
     }
 }
-
+ 
 export function getCurrentPriorityLevel(): PriorityLevel {
     return currentPriorityLevel
 }
@@ -196,13 +197,16 @@ function workLook(initialTime: number) {
             currentPriorityLevel = currentTask.priorityLevel
             const didUserCallbackTimeout = currentTask.expirationTime <= currentTime
             const continuationCallback = callback(didUserCallbackTimeout)
+            currentTime = getCurrentTime()
             if (typeof continuationCallback === "function") {
                 currentTask.callback = continuationCallback
+                advanceTimers(currentTime)
                 return true
             } else {
                 if (currentTask === peek(taskQueue)) {
                     pop(taskQueue)
                 }
+                advanceTimers(currentTime)
             }
         } else {
             pop(taskQueue)
@@ -212,6 +216,10 @@ function workLook(initialTime: number) {
     if (currentTask !== null) {
         return true
     } else {
+        const firstTimer = peek(timerQueue)
+        if (firstTimer) {
+            requestHostTimeout(handleTimeout, firstTimer.sortIndex - currentTime)
+        }
         return false
     }
 }
@@ -225,6 +233,39 @@ function requestHostTimeout(callback: (currentTime: number) => void, ms: number)
 function cancelHostTimeout() {
     clearTimeout(taskTimeoutId)
     taskTimeoutId = -1
+}
+
+function advanceTimers(currentTime: number) {
+    let timer = peek(timerQueue)
+    while (timer) {
+        if (timer.callback === null) {
+            pop(timerQueue)
+        }
+        else if (timer.startTime <= currentTime) {
+            pop(timerQueue)
+            timer.sortIndex = timer.expirationTime
+            push(taskQueue, timer)
+        } else {
+            return
+        }
+        timer = peek(timerQueue)
+    }
+}
+
+function handleTimeout(currentTime: number) {
+    isHostTimeoutScheduled = false
+    advanceTimers(currentTime)
+    if (!isHostCallbackScheduled) {
+        if (peek(taskQueue) !== null) {
+            isHostCallbackScheduled = true
+            requestHostCallback()
+        } else {
+            const firstTimer = peek(timerQueue)
+            if (firstTimer !== null) {
+                requestHostTimeout(handleTimeout, firstTimer.startTime - currentTime)
+            }
+        }
+    }
 }
 
 //何时交还主线程

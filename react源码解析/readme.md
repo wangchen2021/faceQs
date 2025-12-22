@@ -8,7 +8,7 @@ https://www.bilibili.com/video/BV198mKYYEKN/?spm_id_from=333.337.search-card.all
 
 https://www.bilibili.com/video/BV1NvCzYvEBT/?spm_id_from=333.337.search-card.all.click&vd_source=2e335378575371c0ee42c4dc7ddc2978
 
-`curent:` https://www.bilibili.com/video/BV1NvCzYvEBT?spm_id_from=333.788.videopod.episodes&vd_source=2e335378575371c0ee42c4dc7ddc2978&p=16
+`current:` https://www.bilibili.com/video/BV1NvCzYvEBT?spm_id_from=333.788.player.switch&vd_source=2e335378575371c0ee42c4dc7ddc2978&p=43
 
 ***
 
@@ -42,7 +42,7 @@ setTimeout(()=>{
 },1000)
 ```
 
-新版本无效，用黑科技也是一次，可以用特点接口
+新版本无效，用黑科技也是一次，可以用特定接口
 ```javascript
  flushSync(()=>{
     //...todo

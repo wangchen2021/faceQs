@@ -27,6 +27,12 @@ app.get("/test", (req, res) => {
     }, 2000)
 })
 
+app.get("/count", (req, res) => {
+    setTimeout(() => {
+        res.send(5)
+    }, 2000)
+})
+
 // 带参数的路由
 app.get('/user/:id', (req, res) => {
     const userId = req.params.id;

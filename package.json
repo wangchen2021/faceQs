@@ -1,6 +1,22 @@
 {
+	"name": "face_qs",
+	"author": {
+		"name": "Wang Chen"
+	},
 	"type": "module",
+	"scripts": {
+		"commit": "git add . && cz"
+	},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-conventional-changelog"
+		}
+	},
 	"devDependencies": {
+		"@commitlint/cli": "^20.2.0",
+		"@commitlint/config-angular": "^20.2.0",
+		"commitizen": "^4.3.1",
+		"cz-conventional-changelog": "^3.3.0",
 		"less": "^4.4.2"
 	}
 }

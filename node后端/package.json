@@ -12,6 +12,7 @@
   "packageManager": "pnpm@10.20.0",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "react-error-boundary": "^6.0.0"
   }
 }

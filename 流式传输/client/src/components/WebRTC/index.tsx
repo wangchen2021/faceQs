@@ -90,6 +90,7 @@ const WebRTC: React.FC = () => {
                 const remoteStream = event.streams[0];
                 if (remoteVideoRef.current && remoteStream) {
                     remoteVideoRef.current.srcObject = remoteStream as MediaStream;
+                    remoteVideoRef.current.play()
                     setCallStatus('点对点通话已建立，正在通话中...');
                 }
             };
@@ -218,7 +219,7 @@ const WebRTC: React.FC = () => {
                 type: "call"
             }
             // 发送 offer 到信令服务器
-            socket.emit('webRtcSdp',param);
+            socket.emit('webRtcSdp', param);
             setCallStatus('已发起通话请求，等待对方接听...');
         } catch (err) {
             const error = err as Error;

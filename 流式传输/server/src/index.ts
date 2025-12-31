@@ -1,64 +1,15 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
-import { Server } from 'socket.io';
 import http from 'http';
-import { WebRTCTypes } from '@my/shared';
+import { initWebRTC } from './socketIO';
 
 // 创建 Express 实例
 const app = express();
 const port = 3001;
 
-interface UsersData {
-  id: string,
-  userId: string,
-  name: string
-}
-
-let users: Record<string, UsersData> = {}
-let usersIdSocketIdMap = new Map()
 
 const server = http.createServer(app);
 // 跨域配置（测试环境放开所有跨域，生产环境指定域名）
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});
-
-// 监听客户端连接
-io.on('connection', (socket) => {
-  console.log('客户端已连接：', socket.id);
-  const userId = socket.handshake.query.userId as string
-  users[userId] = {
-    id: socket.id,
-    userId,
-    name: "名称是：" + socket.id,
-  }
-  usersIdSocketIdMap.set(socket.id, userId)
-
-  // 转发 SDP 信息（连接描述：offer/answer）
-  socket.on('webRtcSdp', (data: WebRTCTypes.SdpData) => {
-    const { connectId } = data
-    const targetUser = users[connectId]
-    if (targetUser) {
-      socket.to(targetUser.id).emit('webRtcSdp', data);
-    }
-  });
-
-  // 转发 ICE 候选地址（网络地址信息）
-  socket.on('webRtcIce', (iceData) => {
-    socket.broadcast.emit('webRtcIce', iceData);
-  });
-
-  // 监听客户端断开连接
-  socket.on('disconnect', () => {
-    console.log('客户端已断开：', socket.id);
-    const userId = usersIdSocketIdMap.get(socket.id)
-    delete users[userId]
-    usersIdSocketIdMap.delete(socket.id)
-  });
-});
 
 // 1. 跨域配置
 app.use((req: Request, res: Response, next: Function) => {
@@ -71,19 +22,7 @@ app.use((req: Request, res: Response, next: Function) => {
 // 2. 托管前端静态文件（public 目录）
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get("/socket/user", (req: Request, res: Response) => {
-  const { userId } = req.query
-  const resArr = []
-  for (let key in users) {
-    if (key !== userId) {
-      resArr.push(users[key])
-    }
-  }
-  res.json({
-    users: resArr,
-    date: performance.now()
-  })
-})
+initWebRTC(app, server)
 
 // 3. 顺序流式返回长文本接口（TS 类型明确）
 app.get('/stream/text', (req: Request, res: Response) => {
@@ -130,5 +69,5 @@ app.get('/stream/text', (req: Request, res: Response) => {
 
 // 启动服务
 server.listen(port, () => {
-  console.log(`后端 TS 服务运行在 http://localhost:${port}`);
+  console.log(`服务运行在 http://localhost:${port}`);
 });

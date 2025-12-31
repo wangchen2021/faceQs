@@ -5,4 +5,10 @@ export namespace WebRTCTypes{
         userId:string,
         connectId:string,
     }
+
+    interface UsersData {
+    id: string,
+    userId: string,
+    name: string
+}
 }

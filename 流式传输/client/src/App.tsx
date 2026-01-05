@@ -1,12 +1,12 @@
 import './App.css'
-import HLS from './components/HLS'
-import WebRTC from './components/WebRTC'
-
+import FileSliceUpload from './components/FileSliceUpload'
+// import HLS from './components/HLS'
+// import WebRTC from './components/WebRTC'
 
 function App() {
   return (
     <>
-      <WebRTC></WebRTC>
+      <FileSliceUpload></FileSliceUpload>
     </>
   )
 }

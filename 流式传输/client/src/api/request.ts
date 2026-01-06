@@ -1,7 +1,9 @@
 import axios, { type AxiosRequestConfig, type Method } from "axios";
 
-const axiosInstance = axios.create({
-    baseURL: "http://localhost:3001",
+export const baseURL = "http://localhost:3001"
+
+export const axiosInstance = axios.create({
+    baseURL,
 })
 
 export const httpAction = <T>(url: string, method: Method, data?: object, config?: AxiosRequestConfig): Promise<T> => {

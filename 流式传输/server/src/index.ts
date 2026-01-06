@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import http from 'http';
 import { initWebRTC } from './socketIO';
-import { uploadRouter } from './routers';
+import { openAIdRouter, uploadRouter } from './routers';
 
 // 创建 Express 实例
 const app = express();
@@ -34,6 +34,8 @@ app.get("/", (req: Request, res: Response) => {
 })
 
 app.use("/upload", uploadRouter)
+
+app.use("/openAI",openAIdRouter)
 
 // 启动服务
 server.listen(port, () => {
